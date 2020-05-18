@@ -1,0 +1,55 @@
+{
+  "name": "nano-auth-api",
+  "version": "1.0.0",
+  "description": "Nano-Auth authentication management API",
+  "main": "src/app.js",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "apidoc": "^0.22.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "email-templates": "^7.0.5",
+    "express": "^4.17.1",
+    "express-validation": "^3.0.2",
+    "express-winston": "^4.0.3",
+    "helmet": "^3.22.0",
+    "http-status": "^1.4.2",
+    "jwt-simple": "^0.5.6",
+    "lodash": "^4.17.15",
+    "method-override": "^3.0.0",
+    "moment-timezone": "^0.5.31",
+    "mongoose": "^5.9.14",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.4.6",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "docs": "apidoc -i src -o docs",
+    "postdocs": "open docs/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreMarvell/nano-auth-api.git"
+  },
+  "keywords": [
+    "Authentication",
+    "API",
+    "Nanocreatives",
+    "Users"
+  ],
+  "author": "André Marvell IKOUNGA",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndreMarvell/nano-auth-api/issues"
+  },
+  "homepage": "https://github.com/AndreMarvell/nano-auth-api#readme"
+}

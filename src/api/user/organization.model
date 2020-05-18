@@ -1,0 +1,92 @@
+const mongoose = require('mongoose');
+const httpStatus = require('http-status');
+const { omitBy, isNil } = require('lodash');
+
+const APIError = require('../../utils/APIError');
+
+/**
+ * Organization Schema
+ */
+const OrganizationSchema = new mongoose.Schema({
+    code: {
+        type: String,
+        unique: true,
+        trim: true,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+    }
+});
+
+/**
+ * Add your
+ * - pre-save hooks
+ * - validations
+ * - virtuals
+ */
+
+/**
+ * Methods
+ */
+OrganizationSchema.method({
+});
+
+/**
+ * Statics
+ */
+OrganizationSchema.statics = {
+    /**
+     * Get organization
+     *
+     * @param {ObjectId} id - The objectId of organization.
+     * @returns {Promise<Organization, APIError>}
+     */
+    async get(id) {
+        try {
+            let organization;
+
+            if (mongoose.Types.ObjectId.isValid(id)) {
+                organization = await this.findById(id).exec();
+            }
+            if (organization) {
+                return organization;
+            }
+
+            throw new APIError({
+                message: 'This Organization does not exist',
+                status: httpStatus.NOT_FOUND,
+            });
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    /**
+     * List organizations in descending order of 'createdAt' timestamp.
+     *
+     * @param {number} skip - Number of organizations to be skipped.
+     * @param {number} limit - Limit number of organizations to be returned.
+     * @returns {Promise<Organization[]>}
+     */
+    list({
+             page = 1, perPage = 30, name, email, role,
+         }) {
+        const options = omitBy({ name, email, role }, isNil);
+
+        return this.find(options)
+            .sort({ createdAt: -1 })
+            .skip(perPage * (page - 1))
+            .limit(perPage)
+            .exec();
+    }
+};
+
+/**
+ * @typedef Organization
+ */
+module.exports = mongoose.model('Organization', OrganizationSchema);
