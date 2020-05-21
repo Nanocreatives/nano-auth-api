@@ -3,77 +3,89 @@ const Email = require('email-templates');
 
 const config = require('../../config/config');
 const logger = require('../../config/logger');
-
-// SMTP is the main transport in Nodemailer for delivering messages.
-// SMTP is also the protocol used between almost all email hosts, so its truly universal.
-// if you dont want to use SMTP you can create your own transport here
-// such as an email service API or nodemailer-sendgrid-transport
-
+console.log(config)
 const transporter = nodemailer.createTransport({
-    port: config.email.port,
-    host: config.email.host,
+    service: config.email.service,
     auth: {
         user: config.email.username,
         pass: config.email.password,
     },
-    secure: false, // upgrades later with STARTTLS -- change this based on the PORT
 });
 
 // verify connection configuration
 transporter.verify((error) => {
     if (error) {
-        logger.error('error with email connection');
+        logger.error('Error occured when connecting NodeMailer Transport', error);
     }
 });
 
-exports.sendPasswordReset = async (passwordResetObject) => {
-    const email = new Email({
-        views: { root: __dirname },
-        message: {
-            from: 'support@your-app.com',
-        },
-        // uncomment below to send emails in development/test env:
-        send: true,
-        transport: transporter,
-    });
+const email = new Email({
+    views: { root: __dirname },
+    message: {
+        from: `${config.email.appName} <${config.email.from}>`,
+    },
+    // uncomment below to send emails in development/test env:
+    send: config.env !== "development",
+    transport: transporter,
+});
+
+exports.sendAccountVerification = async (accountVerificationObject) => {
 
     email
         .send({
-            template: 'passwordReset',
+            template: 'account-verification',
             message: {
-                to: passwordResetObject.userEmail,
+                to: accountVerificationObject.userEmail,
             },
             locals: {
-                productName: 'Test App',
-                // passwordResetUrl should be a URL to your app that displays a view where they
-                // can enter a new password along with passing the resetToken in the params
-                passwordResetUrl: `https://your-app/new-password/view?resetToken=${passwordResetObject.resetToken}`,
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                email: accountVerificationObject.userEmail,
+                year: (new Date()).getFullYear(),
+                accountVerificationUrl: `${config.email.accountVerificationUrl}?token=${accountVerificationObject.verificationToken}`,
             },
         })
-        .catch(() => logger.error('error sending password reset email'));
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the account verification email', e);
+        });
 };
 
 exports.sendPasswordChangeEmail = async (user) => {
-    const email = new Email({
-        views: { root: __dirname },
-        message: {
-            from: 'support@your-app.com',
-        },
-        // uncomment below to send emails in development/test env:
-        send: true,
-        transport: transporter,
-    });
 
     email
         .send({
-            template: 'passwordChange',
+            template: 'password-change',
             message: {
                 to: user.email,
             },
             locals: {
-                productName: 'Test App',
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                year: (new Date()).getFullYear(),
                 name: user.name,
             },
         })
-        .catch(() => console.log('error sending change password email'));
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the password email', e);
+        });
+};
+
+exports.sendPasswordReset = async (passwordResetObject) => {
+
+    email
+        .send({
+            template: 'password-reset',
+            message: {
+                to: passwordResetObject.userEmail,
+            },
+            locals: {
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                year: (new Date()).getFullYear(),
+                passwordResetUrl: `${config.email.passwordResetUrl}?token=${passwordResetObject.resetToken}`,
+            },
+        })
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the password reset email', e);
+        });
 };

@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const moment = require('moment-timezone');
 
 /**
- * Refresh Token Schema
+ * Password Refresh Token Schema
  * @private
  */
 const passwordResetTokenSchema = new mongoose.Schema({
@@ -37,7 +37,7 @@ passwordResetTokenSchema.statics = {
     async generate(user) {
         const userId = user._id;
         const userEmail = user.email;
-        const resetToken = `${userId}.${crypto.randomBytes(40).toString('hex')}`;
+        const resetToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
         const expires = moment()
             .add(2, 'hours')
             .toDate();

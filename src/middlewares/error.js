@@ -10,7 +10,8 @@ const logger = require('../config/logger');
  */
 const handler = (err, req, res, next) => {
     const response = {
-        code: err.status,
+        status: 'error',
+        code: err.code,
         message: err.message || httpStatus[err.status],
         errors: err.errors,
         stack: err.stack,

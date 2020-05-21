@@ -5,10 +5,11 @@ const httpStatus = require('http-status');
  */
 class ExtendableError extends Error {
     constructor({
-                    message, errors, status, isPublic, stack,
+                    code, message, errors, status, isPublic, stack,
                 }) {
         super(message);
         this.name = this.constructor.name;
+        this.code = code;
         this.message = message;
         this.errors = errors;
         this.status = status;
@@ -26,11 +27,15 @@ class ExtendableError extends Error {
 class APIError extends ExtendableError {
     /**
      * Creates an API error.
+     * @param {string} code - Error specific code.
      * @param {string} message - Error message.
+     * @param {string} errors - Errors
+     * @param {object} stack - Error Stack Trace
      * @param {number} status - HTTP status code of error.
      * @param {boolean} isPublic - Whether the message should be visible to user or not.
      */
     constructor({
+                    code = 'KO',
                     message,
                     errors,
                     stack,
@@ -38,7 +43,7 @@ class APIError extends ExtendableError {
                     isPublic = false,
                 }) {
         super({
-            message, errors, status, isPublic, stack,
+            code, message, errors, status, isPublic, stack,
         });
     }
 }

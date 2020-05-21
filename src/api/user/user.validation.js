@@ -19,7 +19,7 @@ module.exports = {
     createUser: {
         body: Joi.object({
             email: Joi.string().email().required(),
-            password: Joi.string().min(6).max(128).required(),
+            password: Joi.string().min(8).max(128).required(),
             firstname: Joi.string().max(128),
             lastname: Joi.string().max(128),
             role: Joi.string().valid(User.roles),
@@ -30,7 +30,7 @@ module.exports = {
     replaceUser: {
         body: Joi.object({
             email: Joi.string().email().required(),
-            password: Joi.string().min(6).max(128).required(),
+            password: Joi.string().min(8).max(128).required(),
             firstname: Joi.string().max(128),
             lastname: Joi.string().max(128),
             role: Joi.string().valid(User.roles),
@@ -44,7 +44,7 @@ module.exports = {
     updateUser: {
         body: Joi.object({
             email: Joi.string().email(),
-            password: Joi.string().min(6).max(128),
+            password: Joi.string().min(8).max(128),
             firstname: Joi.string().max(128),
             lastname: Joi.string().max(128),
             role: Joi.string().valid(User.roles),

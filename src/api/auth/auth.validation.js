@@ -9,7 +9,7 @@ module.exports = {
                 .required(),
             password: Joi.string()
                 .required()
-                .min(6)
+                .min(8)
                 .max(128),
         }),
     },
@@ -22,6 +22,7 @@ module.exports = {
                 .required(),
             password: Joi.string()
                 .required()
+                .min(8)
                 .max(128),
         }),
     },
@@ -61,9 +62,25 @@ module.exports = {
                 .required(),
             password: Joi.string()
                 .required()
-                .min(6)
+                .min(8)
                 .max(128),
             resetToken: Joi.string().required(),
+        }),
+    },
+
+    // POST /v1/auth/verify
+    verifyAccount: {
+        body: Joi.object({
+            token: Joi.string().required(),
+        }),
+    },
+
+    // POST /v1/auth/send-account-verification
+    sendAccountVerification : {
+        body: Joi.object({
+            email: Joi.string()
+                .email()
+                .required(),
         }),
     },
 };

@@ -10,6 +10,7 @@ const config = {
         host: process.env.MONGO_HOST,
     },
     auth: {
+        accountVerification: process.env.AUTH_ACCOUNT_VERIFICATION === 'true',
         maxLoginAttempt: process.env.AUTH_MAX_LOGIN_ATTEMPT,
         lockDelay: process.env.AUTH_LOCK_DELAY,
         lastPasswordRestriction: process.env.AUTH_LAST_PASSWORD_RESTRICTION,
@@ -21,10 +22,16 @@ const config = {
         },
     },
     email: {
+        service: process.env.EMAIL_SERVICE,
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         username: process.env.EMAIL_USERNAME,
         password: process.env.EMAIL_PASSWORD,
+        from: process.env.EMAIL_FROM,
+        appName: process.env.EMAIL_APP_NAME,
+        appLogo: process.env.EMAIL_APP_LOGO,
+        passwordResetUrl: process.env.EMAIL_PASSWORD_RESET_URL,
+        accountVerificationUrl: process.env.EMAIL_ACCOUNT_VERIFICATION_URL
     }
 };
 
