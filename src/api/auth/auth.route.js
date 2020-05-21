@@ -7,7 +7,6 @@ const {
     login,
     register,
     oAuth,
-    refresh,
     sendPasswordReset,
     passwordReset,
     verifyAccount,
@@ -111,19 +110,20 @@ router.route('/login')
  * @apiGroup Auth
  * @apiPermission public
  *
- * @apiParam  {String}  email         User's email
  * @apiParam  {String}  refreshToken  Refresh token aquired when user logged in
  *
- * @apiSuccess {String}  tokenType     Access Token's type
- * @apiSuccess {String}  accessToken   Authorization Token
- * @apiSuccess {String}  refreshToken  Token to get a new accessToken after expiration time
- * @apiSuccess {Number}  expiresIn     Access Token's expiration time in miliseconds
+ * @apiSuccess  {String}  user.id             User's id
+ * @apiSuccess  {String}  user.lastname       User's lastname
+ * @apiSuccess  {String}  user.firstname      User's firstname
+ * @apiSuccess  {String}  user.email          User's email
+ * @apiSuccess  {String}  user.role           User's role
+ * @apiSuccess  {Date}    user.createdAt      Timestamp
  *
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
- * @apiError (Unauthorized 401) Unauthorized    Incorrect email or refreshToken
+ * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
  */
 router.route('/refresh-token')
-    .post(validate(refresh), controller.refresh);
+    .post(controller.refresh);
 
 /**
  * @api {post} v1/auth/send-password-reset Send Password Reset Email

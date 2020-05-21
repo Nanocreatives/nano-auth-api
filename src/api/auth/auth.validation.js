@@ -36,16 +36,6 @@ module.exports = {
     },
 
     // POST /v1/auth/refresh
-    refresh: {
-        body: Joi.object({
-            email: Joi.string()
-                .email()
-                .required(),
-            refreshToken: Joi.string().required(),
-        }),
-    },
-
-    // POST /v1/auth/refresh
     sendPasswordReset: {
         body: Joi.object({
             email: Joi.string()

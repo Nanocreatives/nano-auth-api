@@ -8,7 +8,7 @@ const jwt = require('jwt-simple');
 
 const APIError = require('../../utils/APIError');
 const config = require('../../config/config');
-const Errors = require('./user.errors');
+const Errors = require('../../utils/auth.errors');
 
 /**
  * User Roles

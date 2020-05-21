@@ -8,7 +8,7 @@ const PasswordResetToken = require('./auth-password-reset-token.model');
 const AccountVerificationToken = require('./auth-account-verification-token.model');
 const emailProvider = require('../../services/email/email.provider');
 const config = require('../../config/config');
-const logger = require('../../config/logger');
+const Errors = require('../../utils/auth.errors');
 const APIError = require('../../utils/APIError');
 const APIStatus = require('../../utils/APIStatus');
 
@@ -115,12 +115,17 @@ exports.oAuth = async (req, res, next) => {
  */
 exports.refresh = async (req, res, next) => {
     try {
-        const { email, refreshToken } = req.body;
+        const refreshTokenCookie = req.signedCookies['refresh_token'];
+        if (!refreshTokenCookie) {
+            throw new APIError(Errors.INVALID_CREDENTIAL);
+        }
         const refreshObject = await RefreshToken.findOneAndRemove({
-            userEmail: email,
-            token: refreshToken,
+            token: refreshTokenCookie,
         });
-        const { user, accessToken } = await User.findAndGenerateToken({ email, refreshObject });
+        if (!refreshObject) {
+            throw new APIError(Errors.INVALID_CREDENTIAL);
+        }
+        const { user, accessToken } = await User.findAndGenerateToken({ email: refreshObject.userEmail, refreshObject });
         generateTokenResponse(user, accessToken, res);
         return res.json(user.transform());
     } catch (error) {
