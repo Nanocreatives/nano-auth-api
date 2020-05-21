@@ -24,14 +24,22 @@ exports.authorize = (roles = User.roles) => async (req, res, next) => {
     });
 
     const authHeader = req.headers["authorization"];
-    let token;
-    if (authHeader.startsWith("Bearer ")){
-        token = authHeader.substring(7, authHeader.length);
+    let tokenHeaderPayload;
+    if (authHeader && authHeader.startsWith("Bearer ")){
+        tokenHeaderPayload = authHeader.substring(7, authHeader.length);
     }
-    if (!token) return next(error);
+    const tokenHeaderPayloadCookie = req.cookies['access_token_hp'];
+    const tokenSignatureCookie = req.signedCookies['access_token_s'];
+
+    if (!tokenSignatureCookie ||
+        !tokenHeaderPayload ||
+        !tokenHeaderPayloadCookie ||
+        tokenHeaderPayload !== tokenHeaderPayloadCookie) {
+        return next(error);
+    }
 
     try {
-        const decoded = jwt.verify(token, config.auth.jwt.secret);
+        const decoded = jwt.decode(`${tokenHeaderPayloadCookie}.${tokenSignatureCookie}`, config.auth.jwtSecret);
         if (moment().isAfter(decoded.exp)) {
             error.message = 'Token Expired';
             return next(error);

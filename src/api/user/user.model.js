@@ -8,6 +8,7 @@ const jwt = require('jwt-simple');
 
 const APIError = require('../../utils/APIError');
 const config = require('../../config/config');
+const Errors = require('./user.errors');
 
 /**
  * User Roles
@@ -135,11 +136,11 @@ userSchema.method({
 
     token() {
         const payload = {
-            exp: moment().add(config.auth.jwt.expirationInterval, 'seconds').unix(),
-            iat: moment().unix(),
+            exp: moment().add(config.auth.accessTokenValidity, 'seconds').toDate(),
+            iat: moment().toDate(),
             sub: this._id,
         };
-        return jwt.encode(payload, config.auth.jwt.secret);
+        return jwt.encode(payload, config.auth.jwtSecret);
     },
 
     async passwordMatches(password) {
@@ -171,10 +172,7 @@ userSchema.statics = {
                 return user;
             }
 
-            throw new APIError({
-                message: 'User does not exist',
-                status: httpStatus.NOT_FOUND,
-            });
+            throw new APIError(Errors.NOT_FOUND);
         } catch (error) {
             throw error;
         }
@@ -183,7 +181,6 @@ userSchema.statics = {
     /**
      * Find user by email and tries to generate a JWT token
      *
-     * @param {ObjectId} id - The objectId of user.
      * @returns {Promise<User, APIError>}
      */
     async findAndGenerateToken(options) {
@@ -191,25 +188,21 @@ userSchema.statics = {
         if (!email) throw new APIError({ message: 'An email is required to generate a token' });
 
         const user = await this.findOne({ email }).exec();
-        const err = {
-            status: httpStatus.UNAUTHORIZED,
-            isPublic: true,
-        };
+
         if (password) {
             if (user && await user.passwordMatches(password)) {
-                return { user, accessToken: user.token() };
+                if (user.verified) {
+                    return { user, accessToken: user.token() };
+                }else{
+                    throw new APIError(Errors.ACCOUNT_UNVERIFIED);
+                }
             }
-            err.message = 'Incorrect email or password';
         } else if (refreshObject && refreshObject.userEmail === email) {
-            if (moment(refreshObject.expires).isBefore()) {
-                err.message = 'Invalid refresh token.';
-            } else {
+            if (moment(refreshObject.expires).isAfter()) {
                 return { user, accessToken: user.token() };
             }
-        } else {
-            err.message = 'Incorrect email or refreshToken';
         }
-        throw new APIError(err);
+        throw new APIError(Errors.INVALID_CREDENTIAL);
     },
 
     /**

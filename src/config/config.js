@@ -6,6 +6,7 @@ const config = {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
     version: process.env.VERSION,
+    cookieParserSecret: process.env.EXPRESS_COOKIE_PARSER_SECRET,
     mongo: {
         host: process.env.MONGO_HOST,
     },
@@ -16,10 +17,7 @@ const config = {
         lastPasswordRestriction: process.env.AUTH_LAST_PASSWORD_RESTRICTION,
         accessTokenValidity: process.env.AUTH_ACCESS_TOKEN_VALIDITY,
         refreshTokenValidity: process.env.AUTH_REFRESH_TOKEN_VALIDITY,
-        jwt: {
-            secret: process.env.AUTH_JWT_SECRET,
-            expirationInterval: process.env.AUTH_JWT_EXPIRATION_INTERVAL,
-        },
+        jwtSecret: process.env.AUTH_JWT_SECRET
     },
     email: {
         service: process.env.EMAIL_SERVICE,

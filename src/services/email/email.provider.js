@@ -3,7 +3,7 @@ const Email = require('email-templates');
 
 const config = require('../../config/config');
 const logger = require('../../config/logger');
-console.log(config)
+
 const transporter = nodemailer.createTransport({
     service: config.email.service,
     auth: {

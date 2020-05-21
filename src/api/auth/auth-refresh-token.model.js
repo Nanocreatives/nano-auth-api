@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const moment = require('moment-timezone');
 
+const config = require('../../config/config');
+
 /**
  * Refresh Token Schema
  * @private
@@ -39,7 +41,7 @@ refreshTokenSchema.statics = {
         const userId = user._id;
         const userEmail = user.email;
         const token = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
-        const expires = moment().add(30, 'days').toDate();
+        const expires = moment().add(config.auth.refreshTokenValidity, 'seconds').toDate();
         const tokenObject = new RefreshToken({
             token, userId, userEmail, expires,
         });

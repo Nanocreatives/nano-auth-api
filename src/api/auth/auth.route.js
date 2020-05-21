@@ -89,11 +89,6 @@ router.route('/verify')
  * @apiParam  {String}         email     User's email
  * @apiParam  {String{..128}}  password  User's password
  *
- * @apiSuccess  {String}  token.tokenType     Access Token's type
- * @apiSuccess  {String}  token.accessToken   Authorization Token
- * @apiSuccess  {String}  token.refreshToken  Token to get a new accessToken after expiration time
- * @apiSuccess  {Number}  token.expiresIn     Access Token's expiration time in miliseconds
- *
  * @apiSuccess  {String}  user.id             User's id
  * @apiSuccess  {String}  user.lastname       User's lastname
  * @apiSuccess  {String}  user.firstname      User's firstname
@@ -102,7 +97,7 @@ router.route('/verify')
  * @apiSuccess  {Date}    user.createdAt      Timestamp
  *
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
- * @apiError (Unauthorized 401)  Unauthorized   Incorrect email or password
+ * @apiError (Unauthorized 401) Unauthorized    Incorrect email or password
  */
 router.route('/login')
     .post(validate(login), controller.login);

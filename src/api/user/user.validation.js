@@ -11,7 +11,7 @@ module.exports = {
             lastname: Joi.string(),
             firstname: Joi.string(),
             email: Joi.string(),
-            role: Joi.string().valid(User.roles),
+            role: Joi.string().valid(...User.roles),
         }),
     },
 
@@ -22,7 +22,7 @@ module.exports = {
             password: Joi.string().min(8).max(128).required(),
             firstname: Joi.string().max(128),
             lastname: Joi.string().max(128),
-            role: Joi.string().valid(User.roles),
+            role: Joi.string().valid(...User.roles),
         }),
     },
 
@@ -33,7 +33,7 @@ module.exports = {
             password: Joi.string().min(8).max(128).required(),
             firstname: Joi.string().max(128),
             lastname: Joi.string().max(128),
-            role: Joi.string().valid(User.roles),
+            role: Joi.string().valid(...User.roles),
         }),
         params: Joi.object({
             userId: Joi.string().regex(/^[a-fA-F0-9]{24}$/).required(),
@@ -47,7 +47,7 @@ module.exports = {
             password: Joi.string().min(8).max(128),
             firstname: Joi.string().max(128),
             lastname: Joi.string().max(128),
-            role: Joi.string().valid(User.roles),
+            role: Joi.string().valid(...User.roles),
         }),
         params: Joi.object({
             userId: Joi.string().regex(/^[a-fA-F0-9]{24}$/).required(),

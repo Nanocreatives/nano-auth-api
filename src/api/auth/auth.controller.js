@@ -16,16 +16,40 @@ const APIStatus = require('../../utils/APIStatus');
  * Returns a formated object with tokens
  * @private
  */
-function generateTokenResponse(user, accessToken) {
-    const tokenType = 'Bearer';
-    const refreshToken = RefreshToken.generate(user).token;
-    const expires = moment().add(config.auth.jwt.expirationInterval, 'seconds');
-    return {
-        tokenType,
-        accessToken,
-        refreshToken,
-        expires,
-    };
+function generateTokenResponse(user, accessToken, res) {
+
+    const tokenParts = accessToken.split('.');
+    if(tokenParts.length === 3){
+        res.cookie('access_token_hp', `${tokenParts[0]}.${tokenParts[1]}`, {
+            maxAge: parseInt(config.auth.accessTokenValidity) * 1000,
+            httpOnly: false,
+            secure: true,
+            sameSite: true
+        });
+
+        res.cookie('access_token_s', tokenParts[2], {
+            maxAge: parseInt(config.auth.accessTokenValidity) * 1000,
+            httpOnly: true,
+            secure: true,
+            signed: true,
+            sameSite: true
+        });
+
+        const refreshToken = RefreshToken.generate(user).token;
+        res.cookie('refresh_token', refreshToken, {
+            maxAge: parseInt(config.auth.refreshTokenValidity) * 1000,
+            httpOnly: true,
+            secure: true,
+            signed: true,
+            sameSite: true
+        });
+    }else{
+        throw new APIError({
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            message: 'KO',
+        });
+    }
+
 }
 
 /**
@@ -51,7 +75,6 @@ exports.register = async (req, res, next) => {
         res.status(httpStatus.CREATED);
         return res.json(userTransformed);
     } catch (error) {
-        logger.error(error);
         return next(User.checkDuplicateEmail(error));
     }
 };
@@ -63,11 +86,9 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     try {
         const { user, accessToken } = await User.findAndGenerateToken(req.body);
-        const token = generateTokenResponse(user, accessToken);
-        const userTransformed = user.transform();
-        return res.json({ token, user: userTransformed });
+        generateTokenResponse(user, accessToken, res);
+        return res.json(user.transform());
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
@@ -81,11 +102,9 @@ exports.oAuth = async (req, res, next) => {
     try {
         const { user } = req;
         const accessToken = user.token();
-        const token = generateTokenResponse(user, accessToken);
-        const userTransformed = user.transform();
-        return res.json({ token, user: userTransformed });
+        generateTokenResponse(user, accessToken, res);
+        return res.json(user.transform());
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
@@ -102,10 +121,9 @@ exports.refresh = async (req, res, next) => {
             token: refreshToken,
         });
         const { user, accessToken } = await User.findAndGenerateToken({ email, refreshObject });
-        const response = generateTokenResponse(user, accessToken);
-        return res.json(response);
+        generateTokenResponse(user, accessToken, res);
+        return res.json(user.transform());
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
@@ -130,7 +148,6 @@ exports.sendPasswordReset = async (req, res, next) => {
             message: 'No account found with that email',
         });
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
@@ -168,7 +185,6 @@ exports.resetPassword = async (req, res, next) => {
         res.status(httpStatus.OK);
         return res.json(new APIStatus({message: "Password updated successfully"}));
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
@@ -200,7 +216,6 @@ exports.verifyAccount = async (req, res, next) => {
         res.status(httpStatus.OK);
         return res.json(new APIStatus({message: "Account verified successfully"}));
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
@@ -225,7 +240,6 @@ exports.sendAccountVerification = async (req, res, next) => {
             message: 'No unverified account found with that email',
         });
     } catch (error) {
-        logger.error(error);
         return next(error);
     }
 };
