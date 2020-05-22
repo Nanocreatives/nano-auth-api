@@ -188,17 +188,24 @@ userSchema.statics = {
         if (!email) throw new APIError({ message: 'An email is required to generate a token' });
 
         const user = await this.findOne({ email }).exec();
-
+        let credentialValid = false;
         if (password) {
             if (user && await user.passwordMatches(password)) {
-                if (user.verified) {
-                    return { user, accessToken: user.token() };
-                }else{
-                    throw new APIError(Errors.ACCOUNT_UNVERIFIED);
-                }
+                credentialValid = true;
             }
         } else if (refreshObject && refreshObject.userEmail === email) {
             if (moment(refreshObject.expires).isAfter()) {
+                credentialValid = true;
+            }
+        }
+        if(credentialValid){
+            if (!user.verified) {
+                throw new APIError(Errors.ACCOUNT_UNVERIFIED);
+            }else if(user.locked){
+                throw new APIError(Errors.ACCOUNT_LOCKED);
+            }else if(user.mustChangePassword){
+                throw new APIError(Errors.MUST_CHANGE_PASSWORD);
+            }else{
                 return { user, accessToken: user.token() };
             }
         }

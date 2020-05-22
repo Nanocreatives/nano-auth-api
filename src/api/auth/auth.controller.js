@@ -134,6 +134,26 @@ exports.refresh = async (req, res, next) => {
 };
 
 /**
+ * Revoke all authentication Tokens
+ * @public
+ */
+exports.logout = async (req, res, next) => {
+    try {
+        res.clearCookie('refresh_token');
+        res.clearCookie('access_token_hp');
+        res.clearCookie('access_token_s');
+
+        res.status(httpStatus.OK);
+
+        return res.json(new APIStatus({
+            message: "Logged Out successfully"
+        }));
+    } catch (error) {
+        return next(error);
+    }
+};
+
+/**
  * Send Password Reset Token to User
  * @public
  */
@@ -184,6 +204,8 @@ exports.resetPassword = async (req, res, next) => {
 
         const user = await User.findOne({ email: resetTokenObject.userEmail }).exec();
         user.password = password;
+        user.locked = false;
+        user.mustChangePassword = false;
         await user.save();
         emailProvider.sendPasswordChangeEmail(user);
 

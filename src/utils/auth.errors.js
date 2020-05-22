@@ -19,6 +19,12 @@ module.exports = {
         message: "Account not verified",
         isPublic: true
     },
+    MUST_CHANGE_PASSWORD: {
+        status: httpStatus.UNAUTHORIZED,
+        code: "MUST_CHANGE_PASSWORD",
+        message: "Your password is not valid anymore. Please change it",
+        isPublic: true
+    },
     ACCOUNT_LOCKED: {
         status: httpStatus.UNAUTHORIZED,
         code: "ACCOUNT_LOCKED",

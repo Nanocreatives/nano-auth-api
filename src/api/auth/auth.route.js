@@ -126,6 +126,30 @@ router.route('/refresh-token')
     .post(controller.refresh);
 
 /**
+ * @api {post} v1/auth/logout Logout
+ * @apiDescription Revoke all authentication tokens
+ * @apiVersion 1.0.0
+ * @apiName Logout
+ * @apiGroup Auth
+ * @apiPermission public
+ *
+ * @apiParam  {String}  Cookie.refreshToken     Refresh token aquired when user logged in
+ * @apiParam  {String}  Cookie.accessTokenHP    Access Token Payload aquired when user logged in
+ * @apiParam  {String}  Cookie.accessTokenS     Access token Signature aquired when user logged in
+ *
+ * @apiSuccess  {String}  user.id             User's id
+ * @apiSuccess  {String}  user.lastname       User's lastname
+ * @apiSuccess  {String}  user.firstname      User's firstname
+ * @apiSuccess  {String}  user.email          User's email
+ * @apiSuccess  {String}  user.role           User's role
+ * @apiSuccess  {Date}    user.createdAt      Timestamp
+ *
+ * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
+ * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
+ */
+router.route('/logout')
+    .post(controller.logout);
+/**
  * @api {post} v1/auth/send-password-reset Send Password Reset Email
  * @apiDescription Send a password reset token to change the account password
  * @apiVersion 1.0.0
