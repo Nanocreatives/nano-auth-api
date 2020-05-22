@@ -201,12 +201,45 @@ userSchema.statics = {
         if(credentialValid){
             if (!user.verified) {
                 throw new APIError(Errors.ACCOUNT_UNVERIFIED);
-            }else if(user.locked){
+            }else if(user.locked && moment().isBefore(user.lockedUntil)){
                 throw new APIError(Errors.ACCOUNT_LOCKED);
             }else if(user.mustChangePassword){
                 throw new APIError(Errors.MUST_CHANGE_PASSWORD);
             }else{
+                if(user.locked && moment().isAfter(user.lockedUntil)){
+                    user.locked = false;
+                    user.lockedUntil = null;
+                    user.lockedAt = null;
+                }
+                user.lastLoginDate.unshift(Date.now());
+                user.lastLoginDate = user.lastLoginDate.slice(0, 5);
+                user.lastLoginAttempts = [];
+                user.save();
                 return { user, accessToken: user.token() };
+            }
+        }else if(password){
+            if(user.locked && moment().isBefore(user.lockedUntil)){
+                throw new APIError(Errors.ACCOUNT_LOCKED);
+            }else{
+                if(user.locked && moment().isAfter(user.lockedUntil)){
+                    user.locked = false;
+                    user.lockedUntil = null;
+                    user.lockedAt = null;
+                    user.lastLoginAttempts = [];
+                }
+                user.lastLoginAttempts.unshift(Date.now());
+                if(user.lastLoginAttempts.length >= config.auth.maxLoginAttempt){
+                    user.locked = true;
+                    user.lockedUntil = moment().add(config.auth.lockDelay, 'hours').toDate();
+                    user.lockedAt = Date.now();
+                    user.save();
+                    throw new APIError(Errors.ACCOUNT_LOCKED);
+                }else if(user.lastLoginAttempts.length + 1 === config.auth.maxLoginAttempt){
+                    user.save();
+                    throw new APIError(Errors.LOCKED_ON_NEXT_FAILED_ATTEMPT);
+                }else{
+                    user.save();
+                }
             }
         }
         throw new APIError(Errors.INVALID_CREDENTIAL);

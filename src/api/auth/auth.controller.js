@@ -204,8 +204,15 @@ exports.resetPassword = async (req, res, next) => {
 
         const user = await User.findOne({ email: resetTokenObject.userEmail }).exec();
         user.password = password;
-        user.locked = false;
-        user.mustChangePassword = false;
+        if(user.locked){
+            user.locked = false;
+            user.lockedUntil = null;
+            user.lockedAt = null;
+            user.lastLoginAttempts = [];
+        }
+        if(user.mustChangePassword){
+            user.mustChangePassword = false;
+        }
         await user.save();
         emailProvider.sendPasswordChangeEmail(user);
 

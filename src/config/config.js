@@ -12,7 +12,7 @@ const config = {
     },
     auth: {
         accountVerification: process.env.AUTH_ACCOUNT_VERIFICATION === 'true',
-        maxLoginAttempt: process.env.AUTH_MAX_LOGIN_ATTEMPT,
+        maxLoginAttempt: parseInt(process.env.AUTH_MAX_LOGIN_ATTEMPT),
         lockDelay: process.env.AUTH_LOCK_DELAY,
         lastPasswordRestriction: process.env.AUTH_LAST_PASSWORD_RESTRICTION,
         accessTokenValidity: process.env.AUTH_ACCESS_TOKEN_VALIDITY,
