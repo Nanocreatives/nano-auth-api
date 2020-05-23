@@ -307,6 +307,9 @@ exports.sendAccountDeletionCode = async (req, res, next) => {
         const user = req.user;
 
         if (user && await user.passwordMatches(password)) {
+            await AccountDeletionCode.deleteMany({
+                userEmail: user.email
+            });
             const deletionCodeObj = await AccountDeletionCode.generate(user);
             emailProvider.sendAccountDeletionCodeEmail(deletionCodeObj);
             res.status(httpStatus.OK);
@@ -339,6 +342,7 @@ exports.deleteAccount = async (req, res, next) => {
                 code,
             });
             if (!deletionCodeObj) {
+                await AccountDeletionCode.deleteMany({userEmail});
                 throw new APIError(err);
             }
 
