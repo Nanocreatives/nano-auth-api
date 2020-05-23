@@ -28,6 +28,7 @@ const config = {
         from: process.env.EMAIL_FROM,
         appName: process.env.EMAIL_APP_NAME,
         appLogo: process.env.EMAIL_APP_LOGO,
+        appWebsiteUrl: process.env.EMAIL_APP_WEBSITE_URL,
         passwordResetUrl: process.env.EMAIL_PASSWORD_RESET_URL,
         accountVerificationUrl: process.env.EMAIL_ACCOUNT_VERIFICATION_URL
     }

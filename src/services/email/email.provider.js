@@ -40,6 +40,7 @@ exports.sendAccountVerification = async (accountVerificationObject) => {
             locals: {
                 appName: config.email.appName,
                 appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
                 email: accountVerificationObject.userEmail,
                 year: (new Date()).getFullYear(),
                 accountVerificationUrl: `${config.email.accountVerificationUrl}?token=${accountVerificationObject.verificationToken}`,
@@ -61,12 +62,12 @@ exports.sendPasswordChangeEmail = async (user) => {
             locals: {
                 appName: config.email.appName,
                 appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
                 year: (new Date()).getFullYear(),
-                name: user.name,
             },
         })
         .catch((e) => {
-            logger.error('An error occurred during the sending of the password email', e);
+            logger.error('An error occurred during the sending of the password change email', e);
         });
 };
 
@@ -81,11 +82,32 @@ exports.sendPasswordReset = async (passwordResetObject) => {
             locals: {
                 appName: config.email.appName,
                 appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
                 year: (new Date()).getFullYear(),
                 passwordResetUrl: `${config.email.passwordResetUrl}?token=${passwordResetObject.resetToken}`,
             },
         })
         .catch((e) => {
             logger.error('An error occurred during the sending of the password reset email', e);
+        });
+};
+
+exports.sendAccountLockEmail = async (userEmail) => {
+
+    email
+        .send({
+            template: 'account-locked',
+            message: {
+                to: userEmail,
+            },
+            locals: {
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
+                year: (new Date()).getFullYear(),
+            },
+        })
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the account locked email', e);
         });
 };

@@ -233,7 +233,7 @@ userSchema.statics = {
                     user.lockedUntil = moment().add(config.auth.lockDelay, 'hours').toDate();
                     user.lockedAt = Date.now();
                     user.save();
-                    throw new APIError(Errors.ACCOUNT_LOCKED);
+                    throw new APIError(Errors.ACCOUNT_LOCKED_ON_FAILED_ATTEMPT);
                 }else if(user.lastLoginAttempts.length + 1 === config.auth.maxLoginAttempt){
                     user.save();
                     throw new APIError(Errors.LOCKED_ON_NEXT_FAILED_ATTEMPT);

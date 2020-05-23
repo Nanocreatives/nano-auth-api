@@ -25,6 +25,12 @@ module.exports = {
         message: "Your password is not valid anymore. Please change it",
         isPublic: true
     },
+    ACCOUNT_LOCKED_ON_FAILED_ATTEMPT: {
+        status: httpStatus.UNAUTHORIZED,
+        code: "ACCOUNT_LOCKED_ON_FAILED_ATTEMPT",
+        message: "Your account has been locked",
+        isPublic: true
+    },
     ACCOUNT_LOCKED: {
         status: httpStatus.UNAUTHORIZED,
         code: "ACCOUNT_LOCKED",

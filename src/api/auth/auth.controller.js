@@ -89,6 +89,9 @@ exports.login = async (req, res, next) => {
         generateTokenResponse(user, accessToken, res);
         return res.json(user.transform());
     } catch (error) {
+        if(req.body && req.body.email && error.code === Errors.ACCOUNT_LOCKED_ON_FAILED_ATTEMPT.code){
+            emailProvider.sendAccountLockEmail(req.body.email);
+        }
         return next(error);
     }
 };
