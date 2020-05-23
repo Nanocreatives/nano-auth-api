@@ -139,6 +139,10 @@ exports.refresh = async (req, res, next) => {
  */
 exports.logout = async (req, res, next) => {
     try {
+        const refreshTokenCookie = req.signedCookies['refresh_token'];
+        await RefreshToken.deleteOne({
+            token: refreshTokenCookie,
+        });
         res.clearCookie('refresh_token');
         res.clearCookie('access_token_hp');
         res.clearCookie('access_token_s');
