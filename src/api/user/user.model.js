@@ -119,6 +119,18 @@ userSchema.pre('save', async function save(next) {
     }
 });
 
+userSchema.pre('remove', async function save(next) {
+    try {
+        this.model('AccountDeletionCode').remove({userId : this._id}).exec();
+        this.model('AccountVerificationToken').remove({userId : this._id}).exec();
+        this.model('RefreshToken').remove({userId : this._id}).exec();
+        this.model('PasswordResetToken').remove({userId : this._id}).exec();
+        return next();
+    } catch (error) {
+        return next(error);
+    }
+});
+
 /**
  * Methods
  */
@@ -188,9 +200,12 @@ userSchema.statics = {
         if (!email) throw new APIError({ message: 'An email is required to generate a token' });
 
         const user = await this.findOne({ email }).exec();
+
+        if(!user) throw new APIError(Errors.INVALID_CREDENTIAL)
+
         let credentialValid = false;
         if (password) {
-            if (user && await user.passwordMatches(password)) {
+            if (await user.passwordMatches(password)) {
                 credentialValid = true;
             }
         } else if (refreshObject && refreshObject.userEmail === email) {

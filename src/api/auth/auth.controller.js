@@ -5,6 +5,7 @@ const moment = require('moment-timezone');
 const User = require('../user/user.model');
 const RefreshToken = require('./auth-refresh-token.model');
 const PasswordResetToken = require('./auth-password-reset-token.model');
+const AccountDeletionCode = require('./auth-account-deletion-code.model');
 const AccountVerificationToken = require('./auth-account-verification-token.model');
 const emailProvider = require('../../services/email/email.provider');
 const config = require('../../config/config');
@@ -50,6 +51,17 @@ function generateTokenResponse(user, accessToken, res) {
         });
     }
 
+}
+
+/**
+ * Clear all authentication Cookies
+ * @param res
+ * @private
+ */
+function clearAuthCookies(res){
+    res.clearCookie('refresh_token');
+    res.clearCookie('access_token_hp');
+    res.clearCookie('access_token_s');
 }
 
 /**
@@ -146,9 +158,7 @@ exports.logout = async (req, res, next) => {
         await RefreshToken.deleteOne({
             token: refreshTokenCookie,
         });
-        res.clearCookie('refresh_token');
-        res.clearCookie('access_token_hp');
-        res.clearCookie('access_token_s');
+        clearAuthCookies(res);
 
         res.status(httpStatus.OK);
 
@@ -279,6 +289,69 @@ exports.sendAccountVerification = async (req, res, next) => {
         throw new APIError({
             status: httpStatus.NOT_FOUND,
             message: 'No unverified account found with that email',
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+
+
+/**
+ * Send Account Deletion Code to User
+ * @public
+ */
+exports.sendAccountDeletionCode = async (req, res, next) => {
+    try {
+        const { password } = req.body;
+        const user = req.user;
+
+        if (user && await user.passwordMatches(password)) {
+            const deletionCodeObj = await AccountDeletionCode.generate(user);
+            emailProvider.sendAccountDeletionCodeEmail(deletionCodeObj);
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({message: "Email sent successfully"}));
+        }
+        throw new APIError({
+            status: httpStatus.UNAUTHORIZED,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+/**
+ * Delete the User Account
+ * @public
+ */
+exports.deleteAccount = async (req, res, next) => {
+    try {
+        const { password, code } = req.body;
+        const user = req.user;
+        const userEmail = user.email;
+        const err = {
+            status: httpStatus.UNAUTHORIZED,
+            isPublic: true,
+        };
+        if (user && userEmail && await user.passwordMatches(password)) {
+            const deletionCodeObj = await AccountDeletionCode.findOneAndRemove({
+                userEmail,
+                code,
+            });
+            if (!deletionCodeObj) {
+                throw new APIError(err);
+            }
+
+            await user.remove();
+
+            emailProvider.sendAccountDeletedEmail(user.email);
+            clearAuthCookies(res);
+
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({message: "Password updated successfully"}));
+        }
+        throw new APIError({
+            status: httpStatus.UNAUTHORIZED,
         });
     } catch (error) {
         return next(error);

@@ -59,8 +59,8 @@ exports.authorize = (roles = User.roles) => async (req, res, next) => {
             return next(error);
         }
     } else if (!roles.includes(user.role)) {
-        apiError.status = httpStatus.FORBIDDEN;
-        apiError.message = 'Forbidden';
+        error.status = httpStatus.FORBIDDEN;
+        error.message = 'Forbidden';
         return next(error);
     }
 

@@ -41,18 +41,18 @@ accountVerificationTokenSchema.statics = {
         const userId = user._id;
         const userEmail = user.email;
         const verificationToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
-        const VerificationTokenObject = new AccountVerificationTokenModel({
+        const verificationTokenObject = new AccountVerificationTokenModel({
             verificationToken,
             userId,
             userEmail,
         });
-        await VerificationTokenObject.save();
-        return VerificationTokenObject;
+        await verificationTokenObject.save();
+        return verificationTokenObject;
     },
 };
 
 /**
- * @typedef RefreshToken
+ * @typedef AccountVerificationToken
  */
 const AccountVerificationTokenModel = mongoose.model('AccountVerificationToken', accountVerificationTokenSchema);
 module.exports = AccountVerificationTokenModel;

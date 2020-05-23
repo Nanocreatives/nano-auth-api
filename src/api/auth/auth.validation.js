@@ -29,7 +29,7 @@ module.exports = {
 
     // POST /v1/auth/facebook
     // POST /v1/auth/google
-    oAuth: {
+    oAuthRequest: {
         body: Joi.object({
             access_token: Joi.string().required(),
         }),
@@ -70,6 +70,24 @@ module.exports = {
         body: Joi.object({
             email: Joi.string()
                 .email()
+                .required(),
+        }),
+    },
+
+    // POST /v1/auth/account/send-deletion-request
+    accountDeletionRequest: {
+        body: Joi.object({
+            password: Joi.string()
+                .required()
+        }),
+    },
+
+    // DELETE /v1/auth/account
+    accountDeletion: {
+        body: Joi.object({
+            password: Joi.string()
+                .required(),
+            code: Joi.string()
                 .required(),
         }),
     },

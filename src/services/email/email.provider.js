@@ -51,26 +51,6 @@ exports.sendAccountVerification = async (accountVerificationObject) => {
         });
 };
 
-exports.sendPasswordChangeEmail = async (user) => {
-
-    email
-        .send({
-            template: 'password-change',
-            message: {
-                to: user.email,
-            },
-            locals: {
-                appName: config.email.appName,
-                appLogo: config.email.appLogo,
-                appWebsiteUrl: config.email.appWebsiteUrl,
-                year: (new Date()).getFullYear(),
-            },
-        })
-        .catch((e) => {
-            logger.error('An error occurred during the sending of the password change email', e);
-        });
-};
-
 exports.sendPasswordReset = async (passwordResetObject) => {
 
     email
@@ -92,6 +72,26 @@ exports.sendPasswordReset = async (passwordResetObject) => {
         });
 };
 
+exports.sendPasswordChangeEmail = async (user) => {
+
+    email
+        .send({
+            template: 'password-change',
+            message: {
+                to: user.email,
+            },
+            locals: {
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
+                year: (new Date()).getFullYear(),
+            },
+        })
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the password change email', e);
+        });
+};
+
 exports.sendAccountLockEmail = async (userEmail) => {
 
     email
@@ -109,5 +109,46 @@ exports.sendAccountLockEmail = async (userEmail) => {
         })
         .catch((e) => {
             logger.error('An error occurred during the sending of the account locked email', e);
+        });
+};
+
+exports.sendAccountDeletionCodeEmail = async (accountDeletionObject) => {
+
+    email
+        .send({
+            template: 'account-deletion',
+            message: {
+                to: accountDeletionObject.userEmail,
+            },
+            locals: {
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
+                year: (new Date()).getFullYear(),
+                code: accountDeletionObject.code,
+            },
+        })
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the account deletion code email', e);
+        });
+};
+
+exports.sendAccountDeletedEmail = async (userEmail) => {
+
+    email
+        .send({
+            template: 'account-deleted',
+            message: {
+                to: userEmail,
+            },
+            locals: {
+                appName: config.email.appName,
+                appLogo: config.email.appLogo,
+                appWebsiteUrl: config.email.appWebsiteUrl,
+                year: (new Date()).getFullYear(),
+            },
+        })
+        .catch((e) => {
+            logger.error('An error occurred during the sending of the account deleted email', e);
         });
 };

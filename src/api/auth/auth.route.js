@@ -2,15 +2,17 @@ const express = require('express');
 const { validate } = require('express-validation');
 
 const controller = require('./auth.controller');
-const oAuthLogin = require('../../middlewares/auth').oAuth;
+const { oAuth, authorize } = require('../../middlewares/auth');
 const {
     login,
     register,
-    oAuth,
+    oAuthRequest,
     sendPasswordReset,
     passwordReset,
     verifyAccount,
-    sendAccountVerification
+    sendAccountVerification,
+    accountDeletion,
+    accountDeletionRequest
 } = require('./auth.validation');
 
 const router = express.Router();
@@ -210,7 +212,7 @@ router.route('/reset-password')
  * @apiError (Unauthorized 401)  Unauthorized    Incorrect access_token
  */
 router.route('/facebook')
-    .post(validate(oAuth), oAuthLogin('facebook'), controller.oAuth);
+    .post(validate(oAuthRequest), oAuth('facebook'), controller.oAuth);
 
 /**
  * @api {post} v1/auth/google Google Login
@@ -231,7 +233,51 @@ router.route('/facebook')
  * @apiError (Unauthorized 401)  Unauthorized    Incorrect access_token
  */
 router.route('/google')
-    .post(validate(oAuth), oAuthLogin('google'), controller.oAuth);
+    .post(validate(oAuthRequest), oAuth('google'), controller.oAuth);
+
+/**
+ * @api {post} v1/auth/account/send-deletion-request Send Account Deletion Request Email
+ * @apiDescription Send a code to delete the user account
+ * @apiVersion 1.0.0
+ * @apiName Send Account Deletion Request
+ * @apiGroup Auth
+ * @apiPermission user
+ *
+ * @apiParam    {String}    password    User's password
+ *
+ * @apiSuccess  {String}    status      Status success
+ * @apiSuccess  {String}    code        Status success code
+ * @apiSuccess  {String}    message     Status success message
+ *
+ * @apiError (Unauthorized 401) Unauthorized    Only authenticated users can delete an account
+ * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete an account
+ * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
+ */
+router.route('/account/send-deletion-request')
+    .post(authorize(), validate(accountDeletionRequest), controller.sendAccountDeletionCode);
+
+/**
+ * @api {delete} v1/auth/account Delete Account
+ * @apiDescription Delete the user account
+ * @apiVersion 1.0.0
+ * @apiName Delete Account
+ * @apiGroup Auth
+ * @apiPermission user
+ *
+ * @apiParam    {String}    password    User's password
+ * @apiParam    {String}    code        User's validation code
+ *
+ * @apiSuccess  {String}    status      Status success
+ * @apiSuccess  {String}    code        Status success code
+ * @apiSuccess  {String}    message     Status success message
+ *
+ * @apiError (Unauthorized 401) Unauthorized    Invalid Code
+ * @apiError (Unauthorized 401) Unauthorized    Only authenticated users can delete an account
+ * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete an account
+ * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
+ */
+router.route('/account')
+    .delete(authorize(), validate(accountDeletion), controller.deleteAccount);
 
 
 module.exports = router;
