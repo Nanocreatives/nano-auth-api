@@ -24,14 +24,14 @@ function generateTokenResponse(user, accessToken, res) {
         res.cookie('access_token_hp', `${tokenParts[0]}.${tokenParts[1]}`, {
             maxAge: parseInt(config.auth.accessTokenValidity) * 1000,
             httpOnly: false,
-            secure: true,
+            secure: config.env !== 'development',
             sameSite: true
         });
 
         res.cookie('access_token_s', tokenParts[2], {
             maxAge: parseInt(config.auth.accessTokenValidity) * 1000,
             httpOnly: true,
-            secure: true,
+            secure: config.env !== 'development',
             signed: true,
             sameSite: true
         });
@@ -40,15 +40,12 @@ function generateTokenResponse(user, accessToken, res) {
         res.cookie('refresh_token', refreshToken, {
             maxAge: parseInt(config.auth.refreshTokenValidity) * 1000,
             httpOnly: true,
-            secure: true,
+            secure: config.env !== 'development',
             signed: true,
             sameSite: true
         });
     }else{
-        throw new APIError({
-            status: httpStatus.INTERNAL_SERVER_ERROR,
-            message: 'KO',
-        });
+        throw new APIError(Errors.KO_AUTH_TOKEN);
     }
 
 }
@@ -185,10 +182,7 @@ exports.sendPasswordReset = async (req, res, next) => {
             res.status(httpStatus.OK);
             return res.json(new APIStatus({message: "Email sent successfully"}));
         }
-        throw new APIError({
-            status: httpStatus.NOT_FOUND,
-            message: 'No account found with that email',
-        });
+        throw new APIError(Errors.NOT_FOUND);
     } catch (error) {
         return next(error);
     }
@@ -206,17 +200,8 @@ exports.resetPassword = async (req, res, next) => {
             resetToken,
         });
 
-        const err = {
-            status: httpStatus.UNAUTHORIZED,
-            isPublic: true,
-        };
-        if (!resetTokenObject) {
-            err.message = 'Cannot find matching reset token';
-            throw new APIError(err);
-        }
-        if (moment().isAfter(resetTokenObject.expires)) {
-            err.message = 'Reset token is expired';
-            throw new APIError(err);
+        if (!resetTokenObject || moment().isAfter(resetTokenObject.expires)) {
+            throw new APIError(Errors.INVALID_TOKEN);
         }
 
         const user = await User.findOne({ email: resetTokenObject.userEmail }).exec();
@@ -241,23 +226,48 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 /**
+ * Change the User Password
+ * Used by the authenticated user himself
+ * @public
+ */
+exports.changePassword = async (req, res, next) => {
+    try {
+        const { password, newPassword } = req.body;
+
+        if(password === newPassword){
+            throw new APIError(Errors.PASSWORD_MUST_BE_DIFFERENT)
+        }
+
+        const user = req.user;
+        if(user && await user.passwordMatches(password)){
+            user.password = newPassword;
+            await user.save();
+            emailProvider.sendPasswordChangeEmail(user);
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({message: "Password updated successfully"}));
+        }
+
+        throw new APIError(Errors.UNAUTHORIZED);
+
+    } catch (error) {
+        return next(error);
+    }
+};
+
+/**
  * Verify a registered account
  * @public
  */
 exports.verifyAccount = async (req, res, next) => {
     try {
+
         const { token } = req.body;
         const verificationTokenObject = await AccountVerificationToken.findOneAndRemove({
             verificationToken : token,
         });
 
-        const err = {
-            status: httpStatus.UNAUTHORIZED,
-            isPublic: true,
-        };
         if (!verificationTokenObject) {
-            err.message = 'Token is not valid';
-            throw new APIError(err);
+            throw new APIError(Errors.INVALID_TOKEN);
         }
 
         const user = await User.findOne({ email: verificationTokenObject.userEmail }).exec();
@@ -286,10 +296,7 @@ exports.sendAccountVerification = async (req, res, next) => {
             res.status(httpStatus.OK);
             return res.json(new APIStatus({message: "Email sent successfully"}));
         }
-        throw new APIError({
-            status: httpStatus.NOT_FOUND,
-            message: 'No unverified account found with that email',
-        });
+        throw new APIError(Errors.NOT_FOUND);
     } catch (error) {
         return next(error);
     }
@@ -315,9 +322,7 @@ exports.sendAccountDeletionCode = async (req, res, next) => {
             res.status(httpStatus.OK);
             return res.json(new APIStatus({message: "Email sent successfully"}));
         }
-        throw new APIError({
-            status: httpStatus.UNAUTHORIZED,
-        });
+        throw new APIError(Errors.UNAUTHORIZED);
     } catch (error) {
         return next(error);
     }
@@ -332,10 +337,6 @@ exports.deleteAccount = async (req, res, next) => {
         const { password, code } = req.body;
         const user = req.user;
         const userEmail = user.email;
-        const err = {
-            status: httpStatus.UNAUTHORIZED,
-            isPublic: true,
-        };
         if (user && userEmail && await user.passwordMatches(password)) {
             const deletionCodeObj = await AccountDeletionCode.findOneAndRemove({
                 userEmail,
@@ -343,7 +344,7 @@ exports.deleteAccount = async (req, res, next) => {
             });
             if (!deletionCodeObj) {
                 await AccountDeletionCode.deleteMany({userEmail});
-                throw new APIError(err);
+                throw new APIError(Errors.UNAUTHORIZED);
             }
 
             await user.remove();
@@ -352,11 +353,9 @@ exports.deleteAccount = async (req, res, next) => {
             clearAuthCookies(res);
 
             res.status(httpStatus.OK);
-            return res.json(new APIStatus({message: "Password updated successfully"}));
+            return res.json(new APIStatus({message: "Account deleted successfully"}));
         }
-        throw new APIError({
-            status: httpStatus.UNAUTHORIZED,
-        });
+        throw new APIError(Errors.UNAUTHORIZED);
     } catch (error) {
         return next(error);
     }

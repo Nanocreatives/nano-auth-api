@@ -8,6 +8,7 @@ const {
     register,
     oAuthRequest,
     sendPasswordReset,
+    passwordChange,
     passwordReset,
     verifyAccount,
     sendAccountVerification,
@@ -192,6 +193,27 @@ router.route('/send-password-reset')
  */
 router.route('/reset-password')
     .post(validate(passwordReset), controller.resetPassword);
+
+/**
+ * @api {post} v1/auth/change-password Change Password
+ * @apiDescription Change the password of a user account
+ * @apiVersion 1.0.0
+ * @apiName Change Password
+ * @apiGroup Auth
+ * @apiPermission public
+ *
+ * @apiParam  {String}      password        User current password
+ * @apiParam  {String}      newPassword     New user password
+ *
+ * @apiSuccess  {String}    status      Status success
+ * @apiSuccess  {String}    code        Status success code
+ * @apiSuccess  {String}    message     Status success message
+ *
+ * @apiError (Unauthorized 401) APIError  Invalid current Password
+ * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
+ */
+router.route('/change-password')
+    .post(authorize(), validate(passwordChange), controller.changePassword);
 
 /**
  * @api {post} v1/auth/facebook Facebook Login

@@ -40,6 +40,28 @@ module.exports = {
     NOT_FOUND: {
         status: httpStatus.NOT_FOUND,
         code: "NOT_FOUND",
-        message: 'User does not exist'
+        message: 'Account does not exist'
+    },
+    PASSWORD_MUST_BE_DIFFERENT : {
+        status: httpStatus.BAD_REQUEST,
+        code: "PASSWORD_MUST_BE_DIFFERENT",
+        message: "The new password must be different",
+        isPublic: true,
+    },
+    UNAUTHORIZED : {
+        status: httpStatus.UNAUTHORIZED,
+        code: "UNAUTHORIZED",
+        isPublic: true,
+    },
+    INVALID_TOKEN : {
+        status: httpStatus.UNAUTHORIZED,
+        code: "INVALID_TOKEN",
+        message: "Token is not valid",
+        isPublic: true,
+    },
+    KO_AUTH_TOKEN: {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        code: 'KO_AUTH_TOKEN',
+        message: 'Error occured while generating Auth Tokens',
     }
 };

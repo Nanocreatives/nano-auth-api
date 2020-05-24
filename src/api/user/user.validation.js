@@ -3,7 +3,6 @@ const User = require('./user.model');
 
 module.exports = {
 
-    // GET /v1/users
     listUsers: {
         query: Joi.object({
             page: Joi.number().min(1),
@@ -15,7 +14,6 @@ module.exports = {
         }),
     },
 
-    // POST /v1/users
     createUser: {
         body: Joi.object({
             email: Joi.string().email().required(),
@@ -26,7 +24,6 @@ module.exports = {
         }),
     },
 
-    // PUT /v1/users/:userId
     replaceUser: {
         body: Joi.object({
             email: Joi.string().email().required(),
@@ -40,7 +37,6 @@ module.exports = {
         }),
     },
 
-    // PATCH /v1/users/:userId
     updateUser: {
         body: Joi.object({
             email: Joi.string().email(),
