@@ -1,13 +1,14 @@
 {
   "name": "nano-auth-api",
   "version": "1.0.0",
-  "description": "Nano-Auth authentication management API",
+  "description": "Nanocreatives Authentication Management API",
   "main": "src/app.js",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
-    "apidoc": "^0.22.1",
     "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
+    "commitlint": "^8.3.5",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -28,11 +29,23 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "apidoc": "^0.22.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "^3.1.3",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5"
   },
   "scripts": {
+    "precommit": "npm run prettify && npm run lint",
+    "prestart": "npm run docs",
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
+    "dev": "npm run lint && nodemon src/app.js",
+    "prettify": "prettier --write '**/*.js' --ignore-path .gitignore",
+    "lint": "eslint ./src/ --ignore-path .gitignore",
+    "lint:fix": "npm run lint --fix",
     "docs": "apidoc -i src -o docs",
     "postdocs": "open docs/index.html"
   },

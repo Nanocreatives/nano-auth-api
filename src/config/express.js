@@ -18,20 +18,20 @@ const app = express();
 // request logging. dev: console | production: file
 const morganFormat = config.env === 'development' ? 'dev' : 'combined';
 app.use(
-    morgan(morganFormat, {
-        skip: function(req, res) {
-            return res.statusCode < 400;
-        },
-        stream: process.stderr
-    })
+  morgan(morganFormat, {
+    skip: (req, res) => {
+      return res.statusCode < 400;
+    },
+    stream: process.stderr
+  })
 );
 app.use(
-    morgan(morganFormat, {
-        skip: function(req, res) {
-            return res.statusCode >= 400;
-        },
-        stream: process.stdout
-    })
+  morgan(morganFormat, {
+    skip: (req, res) => {
+      return res.statusCode >= 400;
+    },
+    stream: process.stdout
+  })
 );
 
 // parse body params and attache them to req.body
@@ -50,14 +50,16 @@ app.use(cors());
 
 // enable detailed API logging in dev env
 if (config.env === 'development') {
-    expressWinston.requestWhitelist.push('body');
-    expressWinston.responseWhitelist.push('body');
-    app.use(expressWinston.logger({
-        transports: logger.inoutTransport,
-        meta: true, // optional: log meta data about request (defaults to true)
-        msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms {{req.ip}}',
-        colorStatus: false // Color the status code (default green, 3XX cyan, 4XX yellow, 5XX red).
-    }));
+  expressWinston.requestWhitelist.push('body');
+  expressWinston.responseWhitelist.push('body');
+  app.use(
+    expressWinston.logger({
+      transports: logger.inoutTransport,
+      meta: true, // optional: log meta data about request (defaults to true)
+      msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms {{req.ip}}',
+      colorStatus: false // Color the status code (default green, 3XX cyan, 4XX yellow, 5XX red).
+    })
+  );
 }
 
 // mount api v1 routes

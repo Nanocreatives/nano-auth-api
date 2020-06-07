@@ -6,50 +6,51 @@ const moment = require('moment-timezone');
  * Password Refresh Token Schema
  * @private
  */
-const passwordResetTokenSchema = new mongoose.Schema({
+const passwordResetTokenSchema = new mongoose.Schema(
+  {
     resetToken: {
-        type: String,
-        required: true,
-        index: true,
+      type: String,
+      required: true,
+      index: true
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
     userEmail: {
-        type: 'String',
-        ref: 'User',
-        required: true,
+      type: 'String',
+      ref: 'User',
+      required: true
     },
-    expires: { type: Date },
-}, {
+    expires: { type: Date }
+  },
+  {
     timestamps: true
-});
+  }
+);
 
 passwordResetTokenSchema.statics = {
-    /**
-     * Generate a reset token object and saves it into the database
-     *
-     * @param {User} user
-     * @returns {ResetToken}
-     */
-    async generate(user) {
-        const userId = user._id;
-        const userEmail = user.email;
-        const resetToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
-        const expires = moment()
-            .add(2, 'hours')
-            .toDate();
-        const ResetTokenObject = new PasswordResetTokenModel({
-            resetToken,
-            userId,
-            userEmail,
-            expires,
-        });
-        await ResetTokenObject.save();
-        return ResetTokenObject;
-    },
+  /**
+   * Generate a reset token object and saves it into the database
+   *
+   * @param {User} user
+   * @returns {ResetToken}
+   */
+  async generate(user) {
+    const userId = user._id;
+    const userEmail = user.email;
+    const resetToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
+    const expires = moment().add(2, 'hours').toDate();
+    const ResetTokenObject = new PasswordResetTokenModel({
+      resetToken,
+      userId,
+      userEmail,
+      expires
+    });
+    await ResetTokenObject.save();
+    return ResetTokenObject;
+  }
 };
 
 /**

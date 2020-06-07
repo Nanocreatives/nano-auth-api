@@ -4,16 +4,16 @@ const { validate } = require('express-validation');
 const controller = require('./auth.controller');
 const { oAuth, authorize } = require('../../middlewares/auth');
 const {
-    login,
-    register,
-    oAuthRequest,
-    sendPasswordReset,
-    passwordChange,
-    passwordReset,
-    verifyAccount,
-    sendAccountVerification,
-    accountDeletion,
-    accountDeletionRequest
+  login,
+  register,
+  oAuthRequest,
+  sendPasswordReset,
+  passwordChange,
+  passwordReset,
+  verifyAccount,
+  sendAccountVerification,
+  accountDeletion,
+  accountDeletionRequest
 } = require('./auth.validation');
 
 const router = express.Router();
@@ -37,8 +37,7 @@ const router = express.Router();
  *
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  */
-router.route('/register')
-    .post(validate(register), controller.register);
+router.route('/register').post(validate(register), controller.register);
 
 /**
  * @api {post} v1/auth/send-account-verification Send Verification Account Token
@@ -57,8 +56,9 @@ router.route('/register')
  * @apiError (Not Found 404)    APIError    Unverified Account not found
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
-router.route('/send-account-verification')
-    .post(validate(sendAccountVerification), controller.sendAccountVerification);
+router
+  .route('/send-account-verification')
+  .post(validate(sendAccountVerification), controller.sendAccountVerification);
 
 /**
  * @api {post} v1/auth/verify Verify Account
@@ -77,8 +77,7 @@ router.route('/send-account-verification')
  * @apiError (Unauthorized 401) APIError    Verify Token invalid
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
-router.route('/verify')
-    .post(validate(verifyAccount), controller.verifyAccount);
+router.route('/verify').post(validate(verifyAccount), controller.verifyAccount);
 
 /**
  * @api {post} v1/auth/login Login
@@ -101,9 +100,7 @@ router.route('/verify')
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized    Incorrect email or password
  */
-router.route('/login')
-    .post(validate(login), controller.login);
-
+router.route('/login').post(validate(login), controller.login);
 
 /**
  * @api {post} v1/auth/refresh-token Refresh Token
@@ -125,8 +122,7 @@ router.route('/login')
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
  */
-router.route('/refresh-token')
-    .post(controller.refresh);
+router.route('/refresh-token').post(controller.refresh);
 
 /**
  * @api {post} v1/auth/logout Logout
@@ -150,8 +146,7 @@ router.route('/refresh-token')
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
  */
-router.route('/logout')
-    .post(controller.logout);
+router.route('/logout').post(controller.logout);
 /**
  * @api {post} v1/auth/send-password-reset Send Password Reset Email
  * @apiDescription Send a password reset token to change the account password
@@ -169,8 +164,9 @@ router.route('/logout')
  * @apiError (Not Found 404)    APIError    Account not found
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
-router.route('/send-password-reset')
-    .post(validate(sendPasswordReset), controller.sendPasswordReset);
+router
+  .route('/send-password-reset')
+  .post(validate(sendPasswordReset), controller.sendPasswordReset);
 
 /**
  * @api {post} v1/auth/reset-password Reset Password
@@ -191,8 +187,7 @@ router.route('/send-password-reset')
  * @apiError (Unauthorized 401) APIError  Invalid Verify Token
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  */
-router.route('/reset-password')
-    .post(validate(passwordReset), controller.resetPassword);
+router.route('/reset-password').post(validate(passwordReset), controller.resetPassword);
 
 /**
  * @api {post} v1/auth/change-password Change Password
@@ -212,8 +207,9 @@ router.route('/reset-password')
  * @apiError (Unauthorized 401) APIError  Invalid current Password
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  */
-router.route('/change-password')
-    .post(authorize(), validate(passwordChange), controller.changePassword);
+router
+  .route('/change-password')
+  .post(authorize(), validate(passwordChange), controller.changePassword);
 
 /**
  * @api {post} v1/auth/facebook Facebook Login
@@ -233,8 +229,7 @@ router.route('/change-password')
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  * @apiError (Unauthorized 401)  Unauthorized    Incorrect access_token
  */
-router.route('/facebook')
-    .post(validate(oAuthRequest), oAuth('facebook'), controller.oAuth);
+router.route('/facebook').post(validate(oAuthRequest), oAuth('facebook'), controller.oAuth);
 
 /**
  * @api {post} v1/auth/google Google Login
@@ -254,8 +249,7 @@ router.route('/facebook')
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  * @apiError (Unauthorized 401)  Unauthorized    Incorrect access_token
  */
-router.route('/google')
-    .post(validate(oAuthRequest), oAuth('google'), controller.oAuth);
+router.route('/google').post(validate(oAuthRequest), oAuth('google'), controller.oAuth);
 
 /**
  * @api {post} v1/auth/account/send-deletion-request Send Account Deletion Request Email
@@ -272,11 +266,13 @@ router.route('/google')
  * @apiSuccess  {String}    message     Status success message
  *
  * @apiError (Unauthorized 401) Unauthorized    Only authenticated users can delete an account
- * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete an account
+ * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete an
+ *                                              account
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  */
-router.route('/account/send-deletion-request')
-    .post(authorize(), validate(accountDeletionRequest), controller.sendAccountDeletionCode);
+router
+  .route('/account/send-deletion-request')
+  .post(authorize(), validate(accountDeletionRequest), controller.sendAccountDeletionCode);
 
 /**
  * @api {delete} v1/auth/account Delete Account
@@ -295,11 +291,10 @@ router.route('/account/send-deletion-request')
  *
  * @apiError (Unauthorized 401) Unauthorized    Invalid Code
  * @apiError (Unauthorized 401) Unauthorized    Only authenticated users can delete an account
- * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete an account
+ * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete
+ *                                              an account
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  */
-router.route('/account')
-    .delete(authorize(), validate(accountDeletion), controller.deleteAccount);
-
+router.route('/account').delete(authorize(), validate(accountDeletion), controller.deleteAccount);
 
 module.exports = router;
