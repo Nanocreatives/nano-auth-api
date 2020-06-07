@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const { omit } = require('lodash');
 const moment = require('moment-timezone');
 
-const User = require("../user/user.model");
+const User = require('../user/user.model');
 const RefreshToken = require('./auth-refresh-token.model');
 const PasswordResetToken = require('./auth-password-reset-token.model');
 const AccountDeletionCode = require('./auth-account-deletion-code.model');
