@@ -13,7 +13,9 @@ const {
   verifyAccount,
   sendAccountVerification,
   accountDeletion,
-  accountDeletionRequest
+  accountDeletionRequest,
+  loginChange,
+  loginChangeRequest
 } = require('./auth.validation');
 
 const router = express.Router();
@@ -40,7 +42,7 @@ const router = express.Router();
 router.route('/register').post(validate(register), controller.register);
 
 /**
- * @api {post} v1/auth/send-account-verification Send Verification Account Token
+ * @api {post} v1/auth/verify/request Send Verification Account Token
  * @apiDescription Send a verification account token to verify a new registered account
  * @apiVersion 1.0.0
  * @apiName Send Verification
@@ -57,11 +59,11 @@ router.route('/register').post(validate(register), controller.register);
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
 router
-  .route('/send-account-verification')
+  .route('/verify/request')
   .post(validate(sendAccountVerification), controller.sendAccountVerification);
 
 /**
- * @api {post} v1/auth/verify Verify Account
+ * @api {put} v1/auth/verify Verify Account
  * @apiDescription Verify a registered account
  * @apiVersion 1.0.0
  * @apiName Verify
@@ -77,7 +79,7 @@ router
  * @apiError (Unauthorized 401) APIError    Verify Token invalid
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
-router.route('/verify').post(validate(verifyAccount), controller.verifyAccount);
+router.route('/verify').put(validate(verifyAccount), controller.verifyAccount);
 
 /**
  * @api {post} v1/auth/login Login
@@ -147,8 +149,9 @@ router.route('/refresh-token').post(controller.refresh);
  * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
  */
 router.route('/logout').post(controller.logout);
+
 /**
- * @api {post} v1/auth/send-password-reset Send Password Reset Email
+ * @api {post} v1/auth/password/recovery-request Send Password Reset Email
  * @apiDescription Send a password reset token to change the account password
  * @apiVersion 1.0.0
  * @apiName Send Password Reset
@@ -165,11 +168,11 @@ router.route('/logout').post(controller.logout);
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
 router
-  .route('/send-password-reset')
+  .route('/password/recovery-request')
   .post(validate(sendPasswordReset), controller.sendPasswordReset);
 
 /**
- * @api {post} v1/auth/reset-password Reset Password
+ * @api {put} v1/auth/password/reset Reset Password
  * @apiDescription Reset the password of a user account
  * @apiVersion 1.0.0
  * @apiName Reset Password
@@ -187,10 +190,10 @@ router
  * @apiError (Unauthorized 401) APIError  Invalid Verify Token
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  */
-router.route('/reset-password').post(validate(passwordReset), controller.resetPassword);
+router.route('/password/reset').put(validate(passwordReset), controller.resetPassword);
 
 /**
- * @api {post} v1/auth/change-password Change Password
+ * @api {put} v1/auth/password/change Change Password
  * @apiDescription Change the password of a user account
  * @apiVersion 1.0.0
  * @apiName Change Password
@@ -208,8 +211,8 @@ router.route('/reset-password').post(validate(passwordReset), controller.resetPa
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  */
 router
-  .route('/change-password')
-  .post(authorize(), validate(passwordChange), controller.changePassword);
+  .route('/password/change')
+  .put(authorize(), validate(passwordChange), controller.changePassword);
 
 /**
  * @api {post} v1/auth/facebook Facebook Login
@@ -252,7 +255,7 @@ router.route('/facebook').post(validate(oAuthRequest), oAuth('facebook'), contro
 router.route('/google').post(validate(oAuthRequest), oAuth('google'), controller.oAuth);
 
 /**
- * @api {post} v1/auth/account/send-deletion-request Send Account Deletion Request Email
+ * @api {post} v1/auth/account/deletion-request Send Account Deletion Request Email
  * @apiDescription Send a code to delete the user account
  * @apiVersion 1.0.0
  * @apiName Send Account Deletion Request
@@ -271,7 +274,7 @@ router.route('/google').post(validate(oAuthRequest), oAuth('google'), controller
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  */
 router
-  .route('/account/send-deletion-request')
+  .route('/account/deletion-request')
   .post(authorize(), validate(accountDeletionRequest), controller.sendAccountDeletionCode);
 
 /**
@@ -296,5 +299,52 @@ router
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  */
 router.route('/account').delete(authorize(), validate(accountDeletion), controller.deleteAccount);
+
+/**
+ * @api {post} v1/auth/id/change-request Send Login Change Request Email
+ * @apiDescription Send a code to change the user login
+ * @apiVersion 1.0.0
+ * @apiName Send Login Change Request
+ * @apiGroup Auth
+ * @apiPermission user
+ *
+ * @apiParam    {String}    password    User's password
+ * @apiParam    {String}    newEmail    User's new email
+ *
+ * @apiSuccess  {String}    status      Status success
+ * @apiSuccess  {String}    code        Status success code
+ * @apiSuccess  {String}    message     Status success message
+ *
+ * @apiError (Unauthorized 401) Unauthorized    Only authenticated users can change the login
+ * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can change a login
+ * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
+ */
+router
+  .route('/id/change-request')
+  .post(authorize(), validate(loginChangeRequest), controller.sendAccountLoginChangeCode);
+
+/**
+ * @api {put} v1/auth/id/change Change User ID
+ * @apiDescription Change the user id
+ * @apiVersion 1.0.0
+ * @apiName Change User ID
+ * @apiGroup Auth
+ * @apiPermission user
+ *
+ * @apiParam    {String}    password    User's password
+ * @apiParam    {String}    code        User's validation code
+ * @apiParam    {String}    newEmail    User's new Login
+ *
+ * @apiSuccess  {String}    status      Status success
+ * @apiSuccess  {String}    code        Status success code
+ * @apiSuccess  {String}    message     Status success message
+ *
+ * @apiError (Unauthorized 401) Unauthorized    Invalid Code
+ * @apiError (Unauthorized 401) Unauthorized    Only authenticated users can delete an account
+ * @apiError (Forbidden 403)    Forbidden       Only user with same id or admins can delete
+ *                                              an account
+ * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
+ */
+router.route('/id/change').put(authorize(), validate(loginChange), controller.changeUserLogin);
 
 module.exports = router;

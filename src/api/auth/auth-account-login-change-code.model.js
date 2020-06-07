@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 /**
- * Account Deletion Code Schema
+ * Login Change Code Schema
  * @private
  */
-const accountDeletionCodeModel = new mongoose.Schema(
+const loginChangeCodeModel = new mongoose.Schema(
   {
     code: {
       type: String,
@@ -20,6 +20,10 @@ const accountDeletionCodeModel = new mongoose.Schema(
       type: 'String',
       required: true
     },
+    newEmail: {
+      type: 'String',
+      required: true
+    },
     createdAt: {
       type: Date,
       expires: '10m',
@@ -31,29 +35,31 @@ const accountDeletionCodeModel = new mongoose.Schema(
   }
 );
 
-accountDeletionCodeModel.statics = {
+loginChangeCodeModel.statics = {
   /**
-   * Generate a deletion code object and saves it into the database
+   * Generate a login change code object and saves it into the database
    *
    * @param {User} user
-   * @returns {DeletionCode}
+   * @param {String} newEmail
+   * @returns {LoginChangeCode}
    */
-  async generate(user) {
+  async generate(user, newEmail) {
     const userId = user._id;
     const userEmail = user.email;
     const code = Math.floor(Math.random() * (999999 - 100000)) + 100000;
-    const deletionCodeObject = new AccountDeletionCodeModel({
+    const loginChangeCodeObject = new LoginChangeCodeModel({
       code,
       userId,
-      userEmail
+      userEmail,
+      newEmail
     });
-    await deletionCodeObject.save();
-    return deletionCodeObject;
+    await loginChangeCodeObject.save();
+    return loginChangeCodeObject;
   }
 };
 
 /**
- * @typedef AccountDeletionCode
+ * @typedef LoginChangeCode
  */
-const AccountDeletionCodeModel = mongoose.model('AccountDeletionCode', accountDeletionCodeModel);
-module.exports = AccountDeletionCodeModel;
+const LoginChangeCodeModel = mongoose.model('LoginChangeCode', loginChangeCodeModel);
+module.exports = LoginChangeCodeModel;

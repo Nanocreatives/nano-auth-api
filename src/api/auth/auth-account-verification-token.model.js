@@ -19,7 +19,6 @@ const accountVerificationTokenSchema = new mongoose.Schema(
     },
     userEmail: {
       type: 'String',
-      ref: 'User',
       required: true
     },
     createdAt: {

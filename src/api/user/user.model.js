@@ -89,12 +89,6 @@ const userSchema = new mongoose.Schema(
     lastPasswords: {
       type: [String]
     },
-    organizations: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Organization'
-      }
-    ],
     picture: {
       type: String,
       trim: true
@@ -113,10 +107,24 @@ const userSchema = new mongoose.Schema(
  */
 userSchema.pre('save', async function save(next) {
   try {
-    if (!this.isModified('password')) return next();
-
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
+    if (this.isModified('password')) {
+      const hash = await bcrypt.hash(this.password, 10);
+      this.password = hash;
+    } else if (this.isModified('email')) {
+      this.model('AccountDeletionCode')
+        .update({ userId: this._id }, { userEmail: this.email })
+        .exec();
+      this.model('AccountVerificationToken')
+        .update({ userId: this._id }, { userEmail: this.email })
+        .exec();
+      this.model('RefreshToken').update({ userId: this._id }, { userEmail: this.email }).exec();
+      this.model('PasswordResetToken')
+        .update({ userId: this._id }, { userEmail: this.email })
+        .exec();
+      this.model('LoginChangeCode').update({ userId: this._id }, { userEmail: this.email }).exec();
+    } else {
+      return next();
+    }
 
     return next();
   } catch (error) {
@@ -130,6 +138,7 @@ userSchema.pre('remove', async function save(next) {
     this.model('AccountVerificationToken').remove({ userId: this._id }).exec();
     this.model('RefreshToken').remove({ userId: this._id }).exec();
     this.model('PasswordResetToken').remove({ userId: this._id }).exec();
+    this.model('LoginChangeCode').remove({ userId: this._id }).exec();
     return next();
   } catch (error) {
     return next(error);

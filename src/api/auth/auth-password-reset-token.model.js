@@ -20,7 +20,6 @@ const passwordResetTokenSchema = new mongoose.Schema(
     },
     userEmail: {
       type: 'String',
-      ref: 'User',
       required: true
     },
     expires: { type: Date }

@@ -146,3 +146,26 @@ exports.sendAccountDeletedEmail = async (userEmail) => {
       logger.error('An error occurred during the sending of the account deleted email', e);
     });
 };
+
+exports.sendAccountLoginChangeCodeEmail = async (accountLoginChangeObject) => {
+  email
+    .send({
+      template: 'account-login-change',
+      message: {
+        to: accountLoginChangeObject.userEmail
+      },
+      locals: {
+        appName: config.email.appName,
+        appLogo: config.email.appLogo,
+        appWebsiteUrl: config.email.appWebsiteUrl,
+        year: new Date().getFullYear(),
+        code: accountLoginChangeObject.code
+      }
+    })
+    .catch((e) => {
+      logger.error(
+        'An error occurred during the sending of the account login change code email',
+        e
+      );
+    });
+};

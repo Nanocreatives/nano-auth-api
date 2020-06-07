@@ -48,6 +48,12 @@ module.exports = {
     message: 'The new password must be different',
     isPublic: true
   },
+  LOGIN_MUST_BE_DIFFERENT: {
+    status: httpStatus.BAD_REQUEST,
+    code: 'LOGIN_MUST_BE_DIFFERENT',
+    message: 'The new login must be different',
+    isPublic: true
+  },
   UNAUTHORIZED: {
     status: httpStatus.UNAUTHORIZED,
     code: 'UNAUTHORIZED',
