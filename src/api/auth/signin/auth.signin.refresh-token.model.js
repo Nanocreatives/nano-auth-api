@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const moment = require('moment-timezone');
 
-const config = require('../../config/config');
+const config = require('../../../config/config');
 
 /**
  * Refresh Token Schema

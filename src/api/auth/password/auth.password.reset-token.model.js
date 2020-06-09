@@ -41,7 +41,7 @@ passwordResetTokenSchema.statics = {
     const userEmail = user.email;
     const resetToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
     const expires = moment().add(2, 'hours').toDate();
-    const ResetTokenObject = new PasswordResetTokenModel({
+    const ResetTokenObject = new AuthPasswordResetTokenModel({
       resetToken,
       userId,
       userEmail,
@@ -55,5 +55,5 @@ passwordResetTokenSchema.statics = {
 /**
  * @typedef RefreshToken
  */
-const PasswordResetTokenModel = mongoose.model('PasswordResetToken', passwordResetTokenSchema);
-module.exports = PasswordResetTokenModel;
+const AuthPasswordResetTokenModel = mongoose.model('PasswordResetToken', passwordResetTokenSchema);
+module.exports = AuthPasswordResetTokenModel;

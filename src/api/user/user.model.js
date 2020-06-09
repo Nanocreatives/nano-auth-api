@@ -134,11 +134,11 @@ userSchema.pre('save', async function save(next) {
 
 userSchema.pre('remove', async function save(next) {
   try {
-    this.model('AccountDeletionCode').remove({ userId: this._id }).exec();
-    this.model('AccountVerificationToken').remove({ userId: this._id }).exec();
-    this.model('RefreshToken').remove({ userId: this._id }).exec();
-    this.model('PasswordResetToken').remove({ userId: this._id }).exec();
-    this.model('LoginChangeCode').remove({ userId: this._id }).exec();
+    this.model('AccountDeletionCode').deleteOne({ userId: this._id }).exec();
+    this.model('AccountVerificationToken').deleteOne({ userId: this._id }).exec();
+    this.model('RefreshToken').deleteOne({ userId: this._id }).exec();
+    this.model('PasswordResetToken').deleteOne({ userId: this._id }).exec();
+    this.model('LoginChangeCode').deleteOne({ userId: this._id }).exec();
     return next();
   } catch (error) {
     return next(error);
