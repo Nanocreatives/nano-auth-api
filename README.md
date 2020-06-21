@@ -1,5 +1,5 @@
 # Nanocreatives Authentication API
-==================================
+
 ![](https://github.com/Nanocreatives/nano-auth-api/workflows/Continuous%20Integration/badge.svg)
 
 Authentication management restful API building with Node.js, Express and MongoDB
