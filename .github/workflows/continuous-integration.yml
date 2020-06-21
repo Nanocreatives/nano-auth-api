@@ -1,0 +1,44 @@
+name: Continuous Integration
+
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+        branches:
+            - master
+            - release/*
+
+# Jobs to be executed
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout the code in the pull request
+            - name: 'Checkout source code'
+              uses: actions/checkout@v2
+
+            # Cache node_modules to speed up the process
+            - name: Restore node_modules cache
+              id: cache-npm
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: npm-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      npm-${{ env.cache-name }}-
+                      npm-
+            # Install npm dependencies for Prettier and Jest
+            - name: 'Install npm dependencies'
+              if: steps.cache-npm.outputs.cache-hit != 'true'
+              run: npm ci
+
+            # Prettier formatting
+            - name: 'Code formatting verification with Prettier'
+              run: npm run prettify
+
+            # ESlint
+            - name: 'Code linting with ESLint'
+              run: npm run lint
+
+            # Unit tests
+            #- name: 'Unit test'
+            #  run: npm run test:unit:coverage
