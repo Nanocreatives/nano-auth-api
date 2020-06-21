@@ -18,12 +18,17 @@ const router = express.Router();
  * @apiParam  {String}         email     User's email
  * @apiParam  {String{..128}}  password  User's password
  *
- * @apiSuccess  {String}  user.id             User's id
- * @apiSuccess  {String}  user.lastname       User's lastname
- * @apiSuccess  {String}  user.firstname      User's firstname
- * @apiSuccess  {String}  user.email          User's email
- * @apiSuccess  {String}  user.role           User's role
- * @apiSuccess  {Date}    user.createdAt      Timestamp
+ * @apiSuccess {String}  id         User's id
+ * @apiSuccess {String}  lastname   User's lastname
+ * @apiSuccess {String}  firstname  User's firstname
+ * @apiSuccess {String}  email      User's email
+ * @apiSuccess {String}  role       User's role
+ * @apiSuccess {String}  phone      User's phone number
+ * @apiSuccess {String}  country    User's country
+ * @apiSuccess {String}  picture    User's profile picture
+ * @apiSuccess {Boolean} verified   User's account verification status
+ * @apiSuccess {Date}    createdAt  User's account date of creation
+ * @apiSuccess {Date}    birthdate  User's birthdate
  *
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized    Incorrect email or password
@@ -40,12 +45,17 @@ router.route('/login').post(validate(login), controller.login);
  *
  * @apiParam  {String}  refreshToken  Refresh token aquired when user logged in
  *
- * @apiSuccess  {String}  user.id             User's id
- * @apiSuccess  {String}  user.lastname       User's lastname
- * @apiSuccess  {String}  user.firstname      User's firstname
- * @apiSuccess  {String}  user.email          User's email
- * @apiSuccess  {String}  user.role           User's role
- * @apiSuccess  {Date}    user.createdAt      Timestamp
+ * @apiSuccess {String}  id         User's id
+ * @apiSuccess {String}  lastname   User's lastname
+ * @apiSuccess {String}  firstname  User's firstname
+ * @apiSuccess {String}  email      User's email
+ * @apiSuccess {String}  role       User's role
+ * @apiSuccess {String}  phone      User's phone number
+ * @apiSuccess {String}  country    User's country
+ * @apiSuccess {String}  picture    User's profile picture
+ * @apiSuccess {Boolean} verified   User's account verification status
+ * @apiSuccess {Date}    createdAt  User's account date of creation
+ * @apiSuccess {Date}    birthdate  User's birthdate
  *
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
@@ -64,13 +74,6 @@ router.route('/refresh').post(controller.refresh);
  * @apiParam  {String}  Cookie.accessTokenHP    Access Token Payload aquired when user logged in
  * @apiParam  {String}  Cookie.accessTokenS     Access token Signature aquired when user logged in
  *
- * @apiSuccess  {String}  user.id             User's id
- * @apiSuccess  {String}  user.lastname       User's lastname
- * @apiSuccess  {String}  user.firstname      User's firstname
- * @apiSuccess  {String}  user.email          User's email
- * @apiSuccess  {String}  user.role           User's role
- * @apiSuccess  {Date}    user.createdAt      Timestamp
- *
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized    Invalid refreshToken
  */
@@ -87,9 +90,17 @@ router.route('/logout').post(controller.logout);
  * @apiParam  {String}  access_token  Facebook's access_token
  *
  * @apiSuccess {String}  tokenType     Access Token's type
- * @apiSuccess {String}  accessToken   Authorization Token
- * @apiSuccess {String}  refreshToken  Token to get a new accessToken after expiration time
- * @apiSuccess {Number}  expiresIn     Access Token's expiration time in miliseconds
+ * @apiSuccess {String}  id         User's id
+ * @apiSuccess {String}  lastname   User's lastname
+ * @apiSuccess {String}  firstname  User's firstname
+ * @apiSuccess {String}  email      User's email
+ * @apiSuccess {String}  role       User's role
+ * @apiSuccess {String}  phone      User's phone number
+ * @apiSuccess {String}  country    User's country
+ * @apiSuccess {String}  picture    User's profile picture
+ * @apiSuccess {Boolean} verified   User's account verification status
+ * @apiSuccess {Date}    createdAt  User's account date of creation
+ * @apiSuccess {Date}    birthdate  User's birthdate
  *
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  * @apiError (Unauthorized 401)  Unauthorized    Incorrect access_token
@@ -106,10 +117,17 @@ router.route('/facebook').post(validate(oAuthRequest), oAuth('facebook'), contro
  *
  * @apiParam  {String}  access_token  Google's access_token
  *
- * @apiSuccess {String}  tokenType     Access Token's type
- * @apiSuccess {String}  accessToken   Authorization Token
- * @apiSuccess {String}  refreshToken  Token to get a new accpessToken after expiration time
- * @apiSuccess {Number}  expiresIn     Access Token's expiration time in miliseconds
+ * @apiSuccess {String}  id         User's id
+ * @apiSuccess {String}  lastname   User's lastname
+ * @apiSuccess {String}  firstname  User's firstname
+ * @apiSuccess {String}  email      User's email
+ * @apiSuccess {String}  role       User's role
+ * @apiSuccess {String}  phone      User's phone number
+ * @apiSuccess {String}  country    User's country
+ * @apiSuccess {String}  picture    User's profile picture
+ * @apiSuccess {Boolean} verified   User's account verification status
+ * @apiSuccess {Date}    createdAt  User's account date of creation
+ * @apiSuccess {Date}    birthdate  User's birthdate
  *
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  * @apiError (Unauthorized 401)  Unauthorized    Incorrect access_token

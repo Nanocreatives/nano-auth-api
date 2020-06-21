@@ -74,7 +74,7 @@ exports.authorize = (roles = User.roles) => async (req, res, next) => {
     return next(error);
   }
 
-  req.locals = { user };
+  req.locals = { ...req.locals, user };
 
   return next();
 };

@@ -9,6 +9,9 @@ module.exports = {
       lastname: Joi.string(),
       firstname: Joi.string(),
       email: Joi.string(),
+      phone: Joi.string(),
+      country: Joi.string(),
+      verified: Joi.boolean(),
       role: Joi.string().valid(...User.roles)
     })
   },
@@ -19,7 +22,13 @@ module.exports = {
       password: Joi.string().min(8).max(128).required(),
       firstname: Joi.string().max(128),
       lastname: Joi.string().max(128),
-      role: Joi.string().valid(...User.roles)
+      picture: Joi.string().max(255),
+      phone: Joi.string().max(20),
+      country: Joi.string().max(128),
+      birthdate: Joi.date(),
+      createdAt: Joi.date(),
+      role: Joi.string().valid(...User.roles),
+      verified: Joi.boolean()
     })
   },
 
@@ -29,12 +38,16 @@ module.exports = {
       password: Joi.string().min(8).max(128).required(),
       firstname: Joi.string().max(128),
       lastname: Joi.string().max(128),
-      role: Joi.string().valid(...User.roles)
+      picture: Joi.string().max(255),
+      phone: Joi.string().max(20),
+      country: Joi.string().max(128),
+      birthdate: Joi.date(),
+      createdAt: Joi.date(),
+      role: Joi.string().valid(...User.roles),
+      verified: Joi.boolean()
     }),
     params: Joi.object({
-      userId: Joi.string()
-        .regex(/^[a-fA-F0-9]{24}$/)
-        .required()
+      userId: Joi.string().min(20).required()
     })
   },
 
@@ -44,12 +57,27 @@ module.exports = {
       password: Joi.string().min(8).max(128),
       firstname: Joi.string().max(128),
       lastname: Joi.string().max(128),
-      role: Joi.string().valid(...User.roles)
+      picture: Joi.string().max(255),
+      phone: Joi.string().max(20),
+      country: Joi.string().max(128),
+      birthdate: Joi.date(),
+      createdAt: Joi.date(),
+      role: Joi.string().valid(...User.roles),
+      verified: Joi.boolean()
     }),
     params: Joi.object({
-      userId: Joi.string()
-        .regex(/^[a-fA-F0-9]{24}$/)
-        .required()
+      userId: Joi.string().min(20).required()
+    })
+  },
+
+  updateUserProfile: {
+    body: Joi.object({
+      phone: Joi.string().max(20),
+      country: Joi.string().max(128),
+      birthdate: Joi.date(),
+      picture: Joi.string().max(255),
+      firstname: Joi.string().max(128),
+      lastname: Joi.string().max(128)
     })
   }
 };

@@ -53,6 +53,15 @@ const userSchema = new mongoose.Schema(
       index: true,
       trim: true
     },
+    country: {
+      type: String,
+      maxlength: 128,
+      index: true,
+      trim: true
+    },
+    birthdate: {
+      type: Date
+    },
     providers: {
       facebook: String,
       google: String
@@ -155,6 +164,9 @@ userSchema.method({
       'id',
       'lastname',
       'firstname',
+      'phone',
+      'birthdate',
+      'country',
       'email',
       'picture',
       'role',
@@ -285,13 +297,27 @@ userSchema.statics = {
    * @param {number} limit - Limit number of users to be returned.
    * @returns {Promise<User[]>}
    */
-  list({ page = 1, perPage = 30, name, email, role }) {
-    const options = omitBy({ name, email, role }, isNil);
+  list({
+    page = 1,
+    perPage = 30,
+    name,
+    email,
+    role,
+    firstname,
+    lastname,
+    verified,
+    country,
+    phone
+  }) {
+    const options = omitBy(
+      { name, email, role, firstname, lastname, verified, country, phone },
+      isNil
+    );
 
     return this.find(options)
       .sort({ createdAt: -1 })
       .skip(perPage * (page - 1))
-      .limit(perPage)
+      .limit(parseInt(perPage, 10))
       .exec();
   },
 

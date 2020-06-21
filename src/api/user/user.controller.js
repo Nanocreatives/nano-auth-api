@@ -11,7 +11,7 @@ const logger = require('../../config/logger');
 exports.load = async (req, res, next, id) => {
   try {
     const user = await User.get(id);
-    req.locals = { user };
+    req.locals = { ...req.locals, loadedUser: user };
     return next();
   } catch (error) {
     logger.error('An error occurred during the load of the user', error);
@@ -23,13 +23,13 @@ exports.load = async (req, res, next, id) => {
  * Get user
  * @public
  */
-exports.get = (req, res) => res.json(req.locals.user.transform());
+exports.get = (req, res) => res.json(req.locals.loadedUser.transform());
 
 /**
  * Get logged in user info
  * @public
  */
-exports.loggedIn = (req, res) => res.json(req.user.transform());
+exports.loggedIn = (req, res) => res.json(req.locals.user.transform());
 
 /**
  * Create new user
@@ -52,13 +52,13 @@ exports.create = async (req, res, next) => {
  */
 exports.replace = async (req, res, next) => {
   try {
-    const { user } = req.locals;
+    const { loadedUser, user } = req.locals;
     const newUser = new User(req.body);
     const ommitRole = user.role !== 'admin' ? 'role' : '';
     const newUserObject = omit(newUser.toObject(), '_id', ommitRole);
-
-    await user.updateOne(newUserObject, { override: true, upsert: true });
-    const savedUser = await User.findById(user._id);
+    logger.debug('new newUserObject', newUserObject);
+    await loadedUser.replaceOne(newUserObject);
+    const savedUser = await User.findById(loadedUser._id);
 
     res.json(savedUser.transform());
   } catch (error) {
@@ -73,7 +73,27 @@ exports.replace = async (req, res, next) => {
 exports.update = (req, res, next) => {
   const ommitRole = req.locals.user.role !== 'admin' ? 'role' : '';
   const updatedUser = omit(req.body, ommitRole);
-  const user = Object.assign(req.locals.user, updatedUser);
+  const user = Object.assign(req.locals.loadedUser, updatedUser);
+
+  user
+    .save()
+    .then((savedUser) => res.json(savedUser.transform()))
+    .catch((e) => next(User.checkDuplicateEmail(e)));
+};
+
+/**
+ * Update existing user profile information
+ * @public
+ */
+exports.updateUserProfile = (req, res, next) => {
+  const { firstname, lastname, phone, country, birthdate } = req.body;
+  const user = Object.assign(req.locals.user, {
+    firstname,
+    lastname,
+    phone,
+    country,
+    birthdate
+  });
 
   user
     .save()
@@ -100,9 +120,9 @@ exports.list = async (req, res, next) => {
  * @public
  */
 exports.remove = (req, res, next) => {
-  const { user } = req.locals;
+  const { loadedUser } = req.locals;
 
-  user
+  loadedUser
     .remove()
     .then(() => res.status(httpStatus.NO_CONTENT).end())
     .catch((e) => next(e));

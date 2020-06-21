@@ -17,11 +17,17 @@ const router = express.Router();
  * @apiParam  {String}          email     User's email
  * @apiParam  {String{6..128}}  password  User's password
  *
- * @apiSuccess (Created 201) {String}  user.id          User's id
- * @apiSuccess (Created 201) {String}  user.email       User's email
- * @apiSuccess (Created 201) {String}  user.role        User's role
- * @apiSuccess (Created 201) {String}  user.verified    User's account verification status
- * @apiSuccess (Created 201) {Date}    user.createdAt   Timestamp
+ * @apiSuccess (Created 201) {String}  id           User's id
+ * @apiSuccess (Created 201) {String}  firstname    User's name
+ * @apiSuccess (Created 201) {String}  lastname     User's name
+ * @apiSuccess (Created 201) {String}  email        User's email
+ * @apiSuccess (Created 201) {String}  role         User's role
+ * @apiSuccess (Created 201) {String}  phone        User's phone
+ * @apiSuccess (Created 201) {String}  country      User's country
+ * @apiSuccess (Created 201) {String}  picture      User's profile picture
+ * @apiSuccess (Created 201) {Boolean} verified     User's account verification status
+ * @apiSuccess (Created 201) {Date}    createdAt    User's account date of creation
+ * @apiSuccess (Created 201) {Date}    birthdate    User's birthdate
  *
  * @apiError (Bad Request 400)  APIError  Some parameters may contain invalid values
  */
