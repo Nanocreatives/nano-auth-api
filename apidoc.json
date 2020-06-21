@@ -1,8 +1,8 @@
 {
-  "name": "Nano-Auth API",
+  "name": "Authentication API",
   "version": "1.0.0",
-  "description": "Nano-Auth authentication management API",
-  "title": "Nano-Auth Documentation",
+  "description": "Authentication management API",
+  "title": "Auth Documentation",
   "url" : "-",
   "header": {},
   "footer": {},

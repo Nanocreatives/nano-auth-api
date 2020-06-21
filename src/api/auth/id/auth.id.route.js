@@ -12,7 +12,7 @@ const router = express.Router();
  * @apiDescription Send a code to change the user login
  * @apiVersion 1.0.0
  * @apiName Send Login Change Request
- * @apiGroup Auth
+ * @apiGroup Auth ID
  * @apiPermission user
  *
  * @apiParam    {String}    password    User's password
@@ -35,7 +35,7 @@ router
  * @apiDescription Change the user id
  * @apiVersion 1.0.0
  * @apiName Change User ID
- * @apiGroup Auth
+ * @apiGroup Auth ID
  * @apiPermission user
  *
  * @apiParam    {String}    password    User's password

@@ -12,7 +12,7 @@ const router = express.Router();
  * @apiDescription Get an accessToken
  * @apiVersion 1.0.0
  * @apiName Login
- * @apiGroup Auth
+ * @apiGroup Auth Signing
  * @apiPermission public
  *
  * @apiParam  {String}         email     User's email
@@ -35,7 +35,7 @@ router.route('/login').post(validate(login), controller.login);
  * @apiDescription Refresh expired accessToken
  * @apiVersion 1.0.0
  * @apiName RefreshToken
- * @apiGroup Auth
+ * @apiGroup Auth Signing
  * @apiPermission public
  *
  * @apiParam  {String}  refreshToken  Refresh token aquired when user logged in
@@ -57,7 +57,7 @@ router.route('/refresh').post(controller.refresh);
  * @apiDescription Revoke all authentication tokens
  * @apiVersion 1.0.0
  * @apiName Logout
- * @apiGroup Auth
+ * @apiGroup Auth Signing
  * @apiPermission public
  *
  * @apiParam  {String}  Cookie.refreshToken     Refresh token aquired when user logged in
@@ -81,7 +81,7 @@ router.route('/logout').post(controller.logout);
  * @apiDescription Login with facebook. Creates a new user if it does not exist
  * @apiVersion 1.0.0
  * @apiName FacebookLogin
- * @apiGroup Auth
+ * @apiGroup Auth Social Signing
  * @apiPermission public
  *
  * @apiParam  {String}  access_token  Facebook's access_token
@@ -101,7 +101,7 @@ router.route('/facebook').post(validate(oAuthRequest), oAuth('facebook'), contro
  * @apiDescription Login with google. Creates a new user if it does not exist
  * @apiVersion 1.0.0
  * @apiName GoogleLogin
- * @apiGroup Auth
+ * @apiGroup Auth Social Signing
  * @apiPermission public
  *
  * @apiParam  {String}  access_token  Google's access_token

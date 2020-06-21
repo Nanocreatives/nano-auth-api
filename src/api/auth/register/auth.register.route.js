@@ -11,7 +11,7 @@ const router = express.Router();
  * @apiDescription Register a new user
  * @apiVersion 1.0.0
  * @apiName Register
- * @apiGroup Auth
+ * @apiGroup Auth Registration
  * @apiPermission public
  *
  * @apiParam  {String}          email     User's email
@@ -28,11 +28,11 @@ const router = express.Router();
 router.route('/').post(validate(register), controller.register);
 
 /**
- * @api {post} v1/auth/register/verify/request Send Verification Account Token
+ * @api {post} v1/auth/register/verify/request Send Verification Token
  * @apiDescription Send a verification account token to verify a new registered account
  * @apiVersion 1.0.0
  * @apiName Send Verification
- * @apiGroup Auth
+ * @apiGroup Auth Registration
  * @apiPermission public
  *
  * @apiParam    {String}    email       User's email
@@ -53,7 +53,7 @@ router
  * @apiDescription Verify a registered account
  * @apiVersion 1.0.0
  * @apiName Verify
- * @apiGroup Auth
+ * @apiGroup Auth Registration
  * @apiPermission public
  *
  * @apiParam  {String}      token       Account Verification Token

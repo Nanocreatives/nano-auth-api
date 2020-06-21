@@ -12,7 +12,7 @@ const router = express.Router();
  * @apiDescription Send a code to delete the user account
  * @apiVersion 1.0.0
  * @apiName Send Account Deletion Request
- * @apiGroup Auth
+ * @apiGroup Auth Extermination
  * @apiPermission user
  *
  * @apiParam    {String}    password    User's password
@@ -35,7 +35,7 @@ router
  * @apiDescription Delete the user account
  * @apiVersion 1.0.0
  * @apiName Delete Account
- * @apiGroup Auth
+ * @apiGroup Auth Extermination
  * @apiPermission user
  *
  * @apiParam    {String}    password    User's password

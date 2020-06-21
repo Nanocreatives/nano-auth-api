@@ -12,7 +12,7 @@ const router = express.Router();
  * @apiDescription Send a password reset token to change the account password
  * @apiVersion 1.0.0
  * @apiName Send Password Reset
- * @apiGroup Auth
+ * @apiGroup Auth Password
  * @apiPermission public
  *
  * @apiParam    {String}    email       User's email
@@ -31,7 +31,7 @@ router.route('/recovery-request').post(validate(sendPasswordReset), controller.s
  * @apiDescription Reset the password of a user account
  * @apiVersion 1.0.0
  * @apiName Reset Password
- * @apiGroup Auth
+ * @apiGroup Auth Password
  * @apiPermission public
  *
  * @apiParam  {String}      email       Use email
