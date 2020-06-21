@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AndreMarvell/nano-auth-api.git"
+    "url": "git+https://github.com/Nanocreatives/nano-auth-api.git"
   },
   "keywords": [
     "Authentication",
