@@ -9,20 +9,22 @@ const logger = require('../config/logger');
  * @public
  */
 const handler = (err, req, res, next) => {
-    const response = {
-        status: 'error',
-        code: err.code,
-        message: err.message || httpStatus[err.status],
-        errors: err.errors,
-        stack: err.stack,
-    };
-
+  const response = {
+    status: 'error',
+    code: err.code,
+    message: err.message || httpStatus[err.status],
+    errors: err.errors,
+    stack: err.stack
+  };
+  if (err.stack) {
     logger.error(err.stack);
-    if (env !== 'development') {
-        delete response.stack;
-    }
-    res.status(err.status);
-    res.json(response);
+  }
+  if (env !== 'development') {
+    delete response.stack;
+  }
+  res.status(err.status);
+  res.json(response);
+  next();
 };
 exports.handler = handler;
 
@@ -31,24 +33,24 @@ exports.handler = handler;
  * @public
  */
 exports.converter = (err, req, res, next) => {
-    let convertedError = err;
+  let convertedError = err;
 
-    if (err instanceof expressValidation.ValidationError) {
-        convertedError = new APIError({
-            message: 'Validation Error',
-            errors: err.errors,
-            status: err.status || httpStatus.BAD_REQUEST,
-            stack: err.stack,
-        });
-    } else if (!(err instanceof APIError)) {
-        convertedError = new APIError({
-            message: err.message,
-            status: err.status,
-            stack: err.stack,
-        });
-    }
+  if (err instanceof expressValidation.ValidationError) {
+    convertedError = new APIError({
+      message: 'Validation Error',
+      errors: err.errors,
+      status: err.status || httpStatus.BAD_REQUEST,
+      stack: err.stack
+    });
+  } else if (!(err instanceof APIError)) {
+    convertedError = new APIError({
+      message: err.message,
+      status: err.status,
+      stack: err.stack
+    });
+  }
 
-    return handler(convertedError, req, res);
+  return handler(convertedError, req, res, next);
 };
 
 /**
@@ -56,9 +58,9 @@ exports.converter = (err, req, res, next) => {
  * @public
  */
 exports.notFound = (req, res, next) => {
-    const err = new APIError({
-        message: 'Not found',
-        status: httpStatus.NOT_FOUND,
-    });
-    return handler(err, req, res);
+  const err = new APIError({
+    message: 'Not found',
+    status: httpStatus.NOT_FOUND
+  });
+  return handler(err, req, res, next);
 };
