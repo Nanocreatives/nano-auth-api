@@ -39,13 +39,12 @@
     "prettier": "^2.0.5"
   },
   "scripts": {
-    "precommit": "npm run prettify && npm run lint",
-    "prestart": "npm run docs",
+    "precommit": "npm run validate",
     "start": "node src/app.js",
-    "dev": "npm run lint && nodemon src/app.js",
+    "dev": "npm run validate && nodemon src/app.js",
     "prettify": "prettier --write '**/*.js' --ignore-path .gitignore",
     "lint": "eslint ./src/ --ignore-path .gitignore",
-    "lint:fix": "npm run lint --fix",
+    "validate": "npm run prettify && npm run lint",
     "docs": "apidoc -i src -o docs",
     "postdocs": "open docs/index.html"
   },
@@ -67,7 +66,7 @@
   "author": "André Marvell IKOUNGA",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AndreMarvell/nano-auth-api/issues"
+    "url": "https://github.com/Nanocreatives/nano-auth-api/issues"
   },
-  "homepage": "https://github.com/AndreMarvell/nano-auth-api#readme"
+  "homepage": "https://github.com/Nanocreatives/nano-auth-api#readme"
 }
