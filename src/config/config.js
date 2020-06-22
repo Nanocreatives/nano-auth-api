@@ -3,10 +3,10 @@ const dotEnv = require('dotenv');
 dotEnv.config();
 
 const config = {
-  env: process.env.NODE_ENV,
-  port: process.env.PORT,
+  env: process.env.NODE_ENV || 'development',
+  port: process.env.PORT || '5000',
   version: process.env.VERSION,
-  cookieParserSecret: process.env.EXPRESS_COOKIE_PARSER_SECRET,
+  cookieParserSecret: process.env.EXPRESS_COOKIE_PARSER_SECRET || 'this-is-not-secret',
   mongo: {
     host: process.env.MONGO_HOST
   },
@@ -17,7 +17,7 @@ const config = {
     lastPasswordRestriction: process.env.AUTH_LAST_PASSWORD_RESTRICTION,
     accessTokenValidity: process.env.AUTH_ACCESS_TOKEN_VALIDITY,
     refreshTokenValidity: process.env.AUTH_REFRESH_TOKEN_VALIDITY,
-    jwtSecret: process.env.AUTH_JWT_SECRET
+    jwtSecret: process.env.AUTH_JWT_SECRET || 'this-is-not-secret'
   },
   email: {
     service: process.env.EMAIL_SERVICE,
