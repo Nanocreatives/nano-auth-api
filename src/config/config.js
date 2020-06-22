@@ -3,6 +3,7 @@ const dotEnv = require('dotenv');
 dotEnv.config();
 
 const config = {
+  appName: process.env.APP_NAME,
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   version: process.env.VERSION,
