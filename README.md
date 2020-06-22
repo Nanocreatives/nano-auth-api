@@ -11,7 +11,7 @@ Authentication management restful API building with Node.js, Express and MongoDB
 
 #### Authentication Features
 
- - Registration (with email verification)
+ - Registration
  - Email verification on registration
  - Authentication with JWT
  - JWT Refresh
