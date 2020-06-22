@@ -44,6 +44,7 @@ jobs:
               run: npm run test:coverage
 
             # Code Coverage
+            - name: 'Code Coverage with Codecov'
             - uses: codecov/codecov-action@v1
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
