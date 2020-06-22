@@ -31,6 +31,10 @@ jobs:
               if: steps.cache-npm.outputs.cache-hit != 'true'
               run: npm ci
 
+            # Copy Environnement File
+            - name: 'Copy Environnement File for CI Testing'
+              run: cp .env.example .env
+
             # Prettier formatting
             - name: 'Code formatting verification with Prettier'
               run: npm run prettify
@@ -44,7 +48,8 @@ jobs:
               run: npm run test:coverage
 
             # Code Coverage
-            - uses: codecov/codecov-action@v1
+            - name: 'Code Coverage with Codecov'
+              uses: codecov/codecov-action@v1
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
                 fail_ci_if_error: true
