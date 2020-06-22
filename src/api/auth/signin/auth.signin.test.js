@@ -1,7 +1,6 @@
 /* eslint-env jest */
 const request = require('supertest');
 const httpStatus = require('http-status');
-const moment = require('moment-timezone');
 
 const User = require('../../user/user.model');
 const RefreshToken = require('./auth.signin.refresh-token.model');
