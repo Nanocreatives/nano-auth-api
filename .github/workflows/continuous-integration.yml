@@ -1,11 +1,11 @@
 name: Continuous Integration
 
 on:
-    pull_request:
-        types: [opened, edited, synchronize, reopened]
-        branches:
-            - master
-            - release/*
+    push:
+      branches:
+        - develop
+        - master
+        - release/*
 
 # Jobs to be executed
 jobs:
@@ -40,5 +40,11 @@ jobs:
               run: npm run lint
 
             # Unit tests
-            #- name: 'Unit test'
-            #  run: npm run test:unit:coverage
+            - name: 'Unit test'
+              run: npm run test:coverage
+
+            # Code Coverage
+            - uses: codecov/codecov-action@v1
+              with:
+                token: ${{ secrets.CODECOV_TOKEN }}
+                fail_ci_if_error: true
