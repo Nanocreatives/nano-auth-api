@@ -62,7 +62,14 @@ if (config.env === 'development') {
   );
 }
 
-// mount api v1 routes
+// mount api routes
+app.get('/', (req, res) =>
+  res.send({
+    message: `Welcome to ${config.appName}`,
+    version: config.version,
+    status: 'OK'
+  })
+);
 app.use('/v1', routes);
 
 // if error is not an instanceOf APIError, convert it.
