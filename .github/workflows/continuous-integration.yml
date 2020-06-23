@@ -1,15 +1,12 @@
 name: Continuous Integration
 
 on:
-  pull_request:
-    types: [opened, edited, synchronize, reopened]
-    branches:
-      - staging
-      - master
     push:
       branches:
         - develop
+        - staging
         - master
+        - feature/*
 
 # Jobs to be executed
 jobs:
