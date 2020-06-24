@@ -56,7 +56,6 @@ exports.replace = async (req, res, next) => {
     const newUser = new User(req.body);
     const ommitRole = user.role !== 'admin' ? 'role' : '';
     const newUserObject = omit(newUser.toObject(), '_id', ommitRole);
-    logger.debug('new newUserObject', newUserObject);
     await loadedUser.replaceOne(newUserObject);
     const savedUser = await User.findById(loadedUser._id);
 

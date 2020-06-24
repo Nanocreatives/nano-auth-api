@@ -2,16 +2,21 @@ const { createLogger, format, transports } = require('winston');
 
 const config = require('./config');
 
-function formatParams(info) {
+const formatParams = (info) => {
   const { timestamp, level, message, ...args } = info;
   const ts = timestamp.slice(0, 19).replace('T', ' ');
 
-  return `${ts} ${level}: ${message} ${
-    Object.keys(args).length ? JSON.stringify(args, '', '') : ''
+  return `${ts} ${level}: ${message} \n${
+    Object.keys(args).length ? JSON.stringify(args, '', 2) : ''
   }`;
-}
+};
 
 const fileFormat = format.combine(
+  format((info) => {
+    const formattedInfo = info;
+    formattedInfo.correlationID = config.correlationID || 'No-Correlation-ID';
+    return formattedInfo;
+  })(),
   format.colorize(),
   format.timestamp(),
   format.align(),
@@ -68,6 +73,7 @@ logger.inoutTransport = [new transports.File(options.inout)];
 //
 if (config.env === 'development') {
   logger.add(new transports.Console(options.console));
+  logger.inoutTransport.push(new transports.Console(options.console));
 }
 
 module.exports = logger;
