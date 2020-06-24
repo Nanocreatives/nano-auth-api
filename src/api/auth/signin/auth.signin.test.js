@@ -57,13 +57,14 @@ describe('Auth Signin API', () => {
         .expect(httpStatus.OK)
         .then((res) => {
           delete registeredUser.password;
-          expect(res.header['set-cookie']).toHaveLength(3);
-          expect(res.header['set-cookie'][0]).toContain('access_token_hp=');
-          expect(res.header['set-cookie'][0]).toContain('; Secure; SameSite=Strict');
-          expect(res.header['set-cookie'][1]).toContain('access_token_s=');
-          expect(res.header['set-cookie'][1]).toContain('; HttpOnly; Secure; SameSite=Strict');
-          expect(res.header['set-cookie'][2]).toContain('refresh_token=');
+          expect(res.header['set-cookie']).toHaveLength(4);
+          expect(res.header['set-cookie'][0]).toContain('x-correlation-id=');
+          expect(res.header['set-cookie'][1]).toContain('access_token_hp=');
+          expect(res.header['set-cookie'][1]).toContain('; Secure; SameSite=Strict');
+          expect(res.header['set-cookie'][2]).toContain('access_token_s=');
           expect(res.header['set-cookie'][2]).toContain('; HttpOnly; Secure; SameSite=Strict');
+          expect(res.header['set-cookie'][3]).toContain('refresh_token=');
+          expect(res.header['set-cookie'][3]).toContain('; HttpOnly; Secure; SameSite=Strict');
           expect(res.body.id).toBeDefined();
           expect(res.body.firstname).toBe(registeredUser.firstname);
           expect(res.body.country).toBe(registeredUser.country);
@@ -140,6 +141,28 @@ describe('Auth Signin API', () => {
           expect(res.body.status).toBe('error');
           expect(res.body.code).toBe('INVALID_CREDENTIAL');
           expect(res.body.message).toBe('Invalid credentials');
+        });
+    });
+
+    it('should delete all cookies when logged out', () => {
+      return request(app)
+        .post('/v1/auth/logout')
+        .send()
+        .expect(httpStatus.OK)
+        .then((res) => {
+          delete registeredUser.password;
+          expect(res.header['set-cookie']).toHaveLength(4);
+          expect(res.header['set-cookie'][0]).toContain('x-correlation-id=');
+          expect(res.header['set-cookie'][1]).toBe(
+            'access_token_hp=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
+          );
+          expect(res.header['set-cookie'][2]).toBe(
+            'access_token_s=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
+          );
+          expect(res.header['set-cookie'][3]).toBe(
+            'refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
+          );
+          expect(res.body.status).toBe('success');
         });
     });
   });

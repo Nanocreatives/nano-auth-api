@@ -49,9 +49,9 @@ function generateTokenResponse(user, accessToken, res) {
  * @private
  */
 function clearAuthCookies(res) {
-  res.clearCookie('refresh_token');
   res.clearCookie('access_token_hp');
   res.clearCookie('access_token_s');
+  res.clearCookie('refresh_token');
 }
 
 /**

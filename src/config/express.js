@@ -10,8 +10,9 @@ const expressWinston = require('express-winston');
 
 const config = require('./config');
 const logger = require('./logger');
-const routes = require('../routes/v1');
+const routes = require('../routes');
 const error = require('../middlewares/error');
+const correlator = require('../middlewares/correlator');
 
 const app = express();
 
@@ -49,28 +50,26 @@ app.use(helmet());
 app.use(cors());
 
 // enable detailed API logging in dev env
-if (config.env === 'development') {
+if (config.env) {
   expressWinston.requestWhitelist.push('body');
   expressWinston.responseWhitelist.push('body');
+  expressWinston.bodyBlacklist.push('password');
   app.use(
     expressWinston.logger({
       transports: logger.inoutTransport,
-      meta: true, // optional: log meta data about request (defaults to true)
+      meta: true,
       msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms {{req.ip}}',
-      colorStatus: false // Color the status code (default green, 3XX cyan, 4XX yellow, 5XX red).
+      colorStatus: false,
+      headerBlacklist: ['authorization', 'cookie']
     })
   );
 }
 
-// mount api routes
-app.get('/', (req, res) =>
-  res.send({
-    message: `Welcome to ${config.appName}`,
-    version: config.version,
-    status: 'OK'
-  })
-);
-app.use('/v1', routes);
+// Correlator Middleware to Get and/or Set Correlation ID
+app.use(correlator);
+
+// Routes Configuration
+app.use('/', routes);
 
 // if error is not an instanceOf APIError, convert it.
 app.use(error.converter);
