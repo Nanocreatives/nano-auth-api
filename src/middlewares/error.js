@@ -8,6 +8,7 @@ const logger = require('../config/logger');
  * Error handler. Send stacktrace only during development
  * @public
  */
+// eslint-disable-next-line no-unused-vars
 const handler = (err, req, res, next) => {
   const response = {
     status: 'error',
@@ -24,7 +25,6 @@ const handler = (err, req, res, next) => {
   }
   res.status(err.status);
   res.json(response);
-  next();
 };
 exports.handler = handler;
 
