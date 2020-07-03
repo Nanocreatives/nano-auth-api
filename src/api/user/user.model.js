@@ -117,8 +117,7 @@ const userSchema = new mongoose.Schema(
 userSchema.pre('save', async function save(next) {
   try {
     if (this.isModified('password')) {
-      const hash = await bcrypt.hash(this.password, 10);
-      this.password = hash;
+      this.password = await bcrypt.hash(this.password, 10);
     } else if (this.isModified('email')) {
       this.model('AccountDeletionCode')
         .update({ userId: this._id }, { userEmail: this.email })
@@ -185,7 +184,8 @@ userSchema.method({
     const payload = {
       exp: moment().add(config.auth.accessTokenValidity, 'seconds').toDate(),
       iat: moment().toDate(),
-      sub: this._id
+      sub: this._id,
+      role: this.role
     };
     return jwt.encode(payload, config.auth.jwtSecret);
   },
@@ -292,9 +292,16 @@ userSchema.statics = {
 
   /**
    * List users in descending order of 'createdAt' timestamp.
-   *
-   * @param {number} skip - Number of users to be skipped.
-   * @param {number} limit - Limit number of users to be returned.
+   * @param page
+   * @param perPage
+   * @param name
+   * @param email
+   * @param role
+   * @param firstname
+   * @param lastname
+   * @param verified
+   * @param country
+   * @param phone
    * @returns {Promise<User[]>}
    */
   list({
