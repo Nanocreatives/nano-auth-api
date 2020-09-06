@@ -5,7 +5,7 @@
 [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
-Authentication management restful API building with Node.js, Express and MongoDB
+Authentication management restful API built with Node.js, Express and MongoDB
 
 ## Features
 
