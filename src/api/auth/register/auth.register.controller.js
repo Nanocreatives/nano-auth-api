@@ -14,26 +14,26 @@ const APIStatus = require('../../../utils/APIStatus');
  * @public
  */
 exports.register = async (req, res, next) => {
-  try {
-    const userData = omit(req.body, 'role');
+    try {
+        const userData = omit(req.body, 'role');
 
-    if (!config.auth.accountVerification) {
-      userData.verified = true;
+        if (!config.auth.accountVerification) {
+            userData.verified = true;
+        }
+
+        const user = await new User(userData).save();
+
+        if (!user.verified) {
+            const accountVerificationObj = await AccountVerificationToken.generate(user);
+            emailProvider.sendAccountVerification(accountVerificationObj);
+        }
+
+        const userTransformed = user.transform();
+        res.status(httpStatus.CREATED);
+        return res.json(userTransformed);
+    } catch (error) {
+        return next(User.checkDuplicateEmail(error));
     }
-
-    const user = await new User(userData).save();
-
-    if (!user.verified) {
-      const accountVerificationObj = await AccountVerificationToken.generate(user);
-      emailProvider.sendAccountVerification(accountVerificationObj);
-    }
-
-    const userTransformed = user.transform();
-    res.status(httpStatus.CREATED);
-    return res.json(userTransformed);
-  } catch (error) {
-    return next(User.checkDuplicateEmail(error));
-  }
 };
 
 /**
@@ -41,27 +41,27 @@ exports.register = async (req, res, next) => {
  * @public
  */
 exports.verifyAccount = async (req, res, next) => {
-  try {
-    const { token } = req.body;
-    const verificationTokenObject = await AccountVerificationToken.findOneAndRemove({
-      verificationToken: token
-    });
+    try {
+        const { token } = req.body;
+        const verificationTokenObject = await AccountVerificationToken.findOneAndRemove({
+            verificationToken: token
+        });
 
-    if (!verificationTokenObject) {
-      throw new APIError(Errors.INVALID_TOKEN);
+        if (!verificationTokenObject) {
+            throw new APIError(Errors.INVALID_TOKEN);
+        }
+
+        const user = await User.findOne({
+            email: verificationTokenObject.userEmail
+        }).exec();
+        user.verified = true;
+        await user.save();
+
+        res.status(httpStatus.OK);
+        return res.json(new APIStatus({ message: 'Account verified successfully' }));
+    } catch (error) {
+        return next(error);
     }
-
-    const user = await User.findOne({
-      email: verificationTokenObject.userEmail
-    }).exec();
-    user.verified = true;
-    await user.save();
-
-    res.status(httpStatus.OK);
-    return res.json(new APIStatus({ message: 'Account verified successfully' }));
-  } catch (error) {
-    return next(error);
-  }
 };
 
 /**
@@ -69,18 +69,18 @@ exports.verifyAccount = async (req, res, next) => {
  * @public
  */
 exports.sendAccountVerification = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email }).exec();
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email }).exec();
 
-    if (user && !user.verified) {
-      const accountVerificationObj = await AccountVerificationToken.generate(user);
-      emailProvider.sendAccountVerification(accountVerificationObj);
-      res.status(httpStatus.OK);
-      return res.json(new APIStatus({ message: 'Email sent successfully' }));
+        if (user && !user.verified) {
+            const accountVerificationObj = await AccountVerificationToken.generate(user);
+            emailProvider.sendAccountVerification(accountVerificationObj);
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({ message: 'Email sent successfully' }));
+        }
+        throw new APIError(Errors.NOT_FOUND);
+    } catch (error) {
+        return next(error);
     }
-    throw new APIError(Errors.NOT_FOUND);
-  } catch (error) {
-    return next(error);
-  }
 };

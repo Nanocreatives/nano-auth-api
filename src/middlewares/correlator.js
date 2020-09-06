@@ -6,9 +6,13 @@ const config = require('../config/config');
  * @public
  */
 module.exports = (req, res, next) => {
-  const correlationID = req.cookies['x-correlation-id'] || uuidv4();
-  req.correlationID = correlationID;
-  config.correlationID = correlationID;
-  res.cookie('x-correlation-id', correlationID);
-  next();
+    const correlationID = req.cookies['x-correlation-id'] || uuidv4();
+    req.correlationID = correlationID;
+    config.correlationID = correlationID;
+    res.cookie('x-correlation-id', correlationID, {
+        httpOnly: false,
+        secure: false,
+        sameSite: false
+    });
+    next();
 };

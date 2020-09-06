@@ -51,8 +51,8 @@ router.route('/').post(validate(register), controller.register);
  * @apiError (Bad Request 400)  APIError    Some parameters may contain invalid values
  */
 router
-  .route('/verify/request')
-  .post(validate(sendAccountVerification), controller.sendAccountVerification);
+    .route('/verify/request')
+    .post(validate(sendAccountVerification), controller.sendAccountVerification);
 
 /**
  * @api {put} v1/auth/register/verify Verify Account

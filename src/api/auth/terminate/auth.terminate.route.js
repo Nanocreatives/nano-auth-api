@@ -27,8 +27,8 @@ const router = express.Router();
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  */
 router
-  .route('/request')
-  .post(authorize(), validate(accountDeletionRequest), controller.sendAccountDeletionCode);
+    .route('/request')
+    .post(authorize(), validate(accountDeletionRequest), controller.sendAccountDeletionCode);
 
 /**
  * @api {delete} v1/auth/terminate Delete Account

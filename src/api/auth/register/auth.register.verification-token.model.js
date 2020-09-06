@@ -6,58 +6,58 @@ const crypto = require('crypto');
  * @private
  */
 const accountVerificationTokenSchema = new mongoose.Schema(
-  {
-    verificationToken: {
-      type: String,
-      required: true,
-      index: true
+    {
+        verificationToken: {
+            type: String,
+            required: true,
+            index: true
+        },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        userEmail: {
+            type: 'String',
+            required: true
+        },
+        createdAt: {
+            type: Date,
+            expires: '5d',
+            default: Date.now
+        }
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    userEmail: {
-      type: 'String',
-      required: true
-    },
-    createdAt: {
-      type: Date,
-      expires: '5d',
-      default: Date.now
+    {
+        timestamps: true
     }
-  },
-  {
-    timestamps: true
-  }
 );
 
 accountVerificationTokenSchema.statics = {
-  /**
-   * Generate a verification token object and saves it into the database
-   *
-   * @param {User} user
-   * @returns {VerificationToken}
-   */
-  async generate(user) {
-    const userId = user._id;
-    const userEmail = user.email;
-    const verificationToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
-    const verificationTokenObject = new AccountVerificationTokenModel({
-      verificationToken,
-      userId,
-      userEmail
-    });
-    await verificationTokenObject.save();
-    return verificationTokenObject;
-  }
+    /**
+     * Generate a verification token object and saves it into the database
+     *
+     * @param {User} user
+     * @returns {VerificationToken}
+     */
+    async generate(user) {
+        const userId = user._id;
+        const userEmail = user.email;
+        const verificationToken = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
+        const verificationTokenObject = new AccountVerificationTokenModel({
+            verificationToken,
+            userId,
+            userEmail
+        });
+        await verificationTokenObject.save();
+        return verificationTokenObject;
+    }
 };
 
 /**
  * @typedef AccountVerificationToken
  */
 const AccountVerificationTokenModel = mongoose.model(
-  'AccountVerificationToken',
-  accountVerificationTokenSchema
+    'AccountVerificationToken',
+    accountVerificationTokenSchema
 );
 module.exports = AccountVerificationTokenModel;

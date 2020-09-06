@@ -19,20 +19,20 @@ const app = express();
 // request logging. dev: console | production: file
 const morganFormat = config.env === 'development' ? 'dev' : 'combined';
 app.use(
-  morgan(morganFormat, {
-    skip: (req, res) => {
-      return res.statusCode < 400;
-    },
-    stream: process.stderr
-  })
+    morgan(morganFormat, {
+        skip: (req, res) => {
+            return res.statusCode < 400;
+        },
+        stream: process.stderr
+    })
 );
 app.use(
-  morgan(morganFormat, {
-    skip: (req, res) => {
-      return res.statusCode >= 400;
-    },
-    stream: process.stdout
-  })
+    morgan(morganFormat, {
+        skip: (req, res) => {
+            return res.statusCode >= 400;
+        },
+        stream: process.stdout
+    })
 );
 
 // parse body params and attache them to req.body
@@ -51,18 +51,19 @@ app.use(cors());
 
 // enable detailed API logging in dev env
 if (config.env) {
-  expressWinston.requestWhitelist.push('body');
-  expressWinston.responseWhitelist.push('body');
-  expressWinston.bodyBlacklist.push('password');
-  app.use(
-    expressWinston.logger({
-      transports: logger.inoutTransport,
-      meta: true,
-      msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms {{req.ip}}',
-      colorStatus: false,
-      headerBlacklist: ['authorization', 'cookie']
-    })
-  );
+    expressWinston.requestWhitelist.push('body');
+    expressWinston.responseWhitelist.push('body');
+    expressWinston.bodyBlacklist.push('password');
+    app.use(
+        expressWinston.logger({
+            transports: logger.inoutTransport,
+            meta: true,
+            msg:
+                'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms {{req.ip}}',
+            colorStatus: false,
+            headerBlacklist: ['authorization', 'cookie']
+        })
+    );
 }
 
 // Correlator Middleware to Get and/or Set Correlation ID
