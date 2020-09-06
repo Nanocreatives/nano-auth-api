@@ -18,10 +18,10 @@ router.use('/users', userRoutes);
  *  Health Check
  */
 router.get('/health-check', (req, res) =>
-  res.send({
-    version: config.version,
-    status: 'OK'
-  })
+    res.send({
+        version: config.version,
+        status: 'OK'
+    })
 );
 
 module.exports = router;

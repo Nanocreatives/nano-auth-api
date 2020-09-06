@@ -27,8 +27,8 @@ const router = express.Router();
  * @apiError (Bad Request 400)  APIError        Some parameters may contain invalid values
  */
 router
-  .route('/change-request')
-  .post(authorize(), validate(loginChangeRequest), controller.sendAccountLoginChangeCode);
+    .route('/change-request')
+    .post(authorize(), validate(loginChangeRequest), controller.sendAccountLoginChangeCode);
 
 /**
  * @api {put} v1/auth/id/change Change User ID

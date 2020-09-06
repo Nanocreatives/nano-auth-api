@@ -16,82 +16,82 @@ exports.SUPER_ADMIN = SUPER_ADMIN;
 exports.LOGGED_USER = LOGGED_USER;
 
 exports.authorize = (roles = User.roles) => async (req, res, next) => {
-  let user;
-  const error = new APIError({
-    message: 'Unauthorized',
-    status: httpStatus.UNAUTHORIZED,
-    stack: undefined
-  });
+    let user;
+    const error = new APIError({
+        message: 'Unauthorized',
+        status: httpStatus.UNAUTHORIZED,
+        stack: undefined
+    });
 
-  const authHeader = req.headers.authorization;
-  let tokenHeaderPayload;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    tokenHeaderPayload = authHeader.substring(7, authHeader.length);
-  }
-  const tokenHeaderPayloadCookie = req.cookies.access_token_hp;
-  const tokenSignatureCookie = req.signedCookies.access_token_s;
-
-  if (
-    !tokenSignatureCookie ||
-    !tokenHeaderPayload ||
-    !tokenHeaderPayloadCookie ||
-    tokenHeaderPayload !== tokenHeaderPayloadCookie
-  ) {
-    return next(error);
-  }
-
-  try {
-    const decoded = jwt.decode(
-      `${tokenHeaderPayloadCookie}.${tokenSignatureCookie}`,
-      config.auth.jwtSecret
-    );
-    if (moment().isAfter(decoded.exp)) {
-      error.message = 'Token Expired';
-      return next(error);
+    const authHeader = req.headers.authorization;
+    let tokenHeaderPayload;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        tokenHeaderPayload = authHeader.substring(7, authHeader.length);
     }
-    user = await User.get(decoded.sub);
-  } catch (e) {
-    error.stack = e.stack;
-    return next(error);
-  }
+    const tokenHeaderPayloadCookie = req.cookies.access_token_hp;
+    const tokenSignatureCookie = req.signedCookies.access_token_s;
 
-  if (!user) {
-    return next(error);
-  }
-  if (roles === LOGGED_USER) {
     if (
-      user.role !== SUPER_ADMIN &&
-      user.role !== ADMIN &&
-      req.params.userId !== user._id.toString()
+        !tokenSignatureCookie ||
+        !tokenHeaderPayload ||
+        !tokenHeaderPayloadCookie ||
+        tokenHeaderPayload !== tokenHeaderPayloadCookie
     ) {
-      error.status = httpStatus.FORBIDDEN;
-      error.message = 'Forbidden';
-      return next(error);
+        return next(error);
     }
-  } else if (!roles.includes(user.role)) {
-    error.status = httpStatus.FORBIDDEN;
-    error.message = 'Forbidden';
-    return next(error);
-  }
 
-  req.locals = { ...req.locals, user };
+    try {
+        const decoded = jwt.decode(
+            `${tokenHeaderPayloadCookie}.${tokenSignatureCookie}`,
+            config.auth.jwtSecret
+        );
+        if (moment().isAfter(decoded.exp)) {
+            error.message = 'Token Expired';
+            return next(error);
+        }
+        user = await User.get(decoded.sub);
+    } catch (e) {
+        error.stack = e.stack;
+        return next(error);
+    }
 
-  return next();
+    if (!user) {
+        return next(error);
+    }
+    if (roles === LOGGED_USER) {
+        if (
+            user.role !== SUPER_ADMIN &&
+            user.role !== ADMIN &&
+            req.params.userId !== user._id.toString()
+        ) {
+            error.status = httpStatus.FORBIDDEN;
+            error.message = 'Forbidden';
+            return next(error);
+        }
+    } else if (!roles.includes(user.role)) {
+        error.status = httpStatus.FORBIDDEN;
+        error.message = 'Forbidden';
+        return next(error);
+    }
+
+    req.locals = { ...req.locals, user };
+
+    return next();
 };
 
 exports.oAuth = (service) => async (req, res, next) => {
-  try {
-    const providerAccessToken = req.body.access_token;
-    const userData = await authProvider[service](providerAccessToken);
-    const user = await User.oAuthLogin(userData);
-    req.user = user;
-    return next();
-  } catch (e) {
-    const error = new APIError({
-      message: 'Unauthorized',
-      status: httpStatus.UNAUTHORIZED,
-      stack: e.stack
-    });
-    return next(error);
-  }
+    try {
+        const providerAccessToken = req.body.access_token;
+        const userData = await authProvider[service](providerAccessToken);
+        const user = await User.oAuthLogin(userData);
+        req.user = user;
+        return next();
+    } catch (e) {
+        const error = new APIError({
+            message: 'Unauthorized',
+            status: httpStatus.UNAUTHORIZED,
+            stack: e.stack
+        });
+        return next(error);
+    }
 };

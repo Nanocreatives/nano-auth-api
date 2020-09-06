@@ -9,14 +9,14 @@ const logger = require('../../config/logger');
  * @public
  */
 exports.load = async (req, res, next, id) => {
-  try {
-    const user = await User.get(id);
-    req.locals = { ...req.locals, loadedUser: user };
-    return next();
-  } catch (error) {
-    logger.error('An error occurred during the load of the user', error);
-    return next();
-  }
+    try {
+        const user = await User.get(id);
+        req.locals = { ...req.locals, loadedUser: user };
+        return next();
+    } catch (error) {
+        logger.error('An error occurred during the load of the user', error);
+        return next();
+    }
 };
 
 /**
@@ -36,14 +36,14 @@ exports.loggedIn = (req, res) => res.json(req.locals.user.transform());
  * @public
  */
 exports.create = async (req, res, next) => {
-  try {
-    const user = new User(req.body);
-    const savedUser = await user.save();
-    res.status(httpStatus.CREATED);
-    res.json(savedUser.transform());
-  } catch (error) {
-    next(User.checkDuplicateEmail(error));
-  }
+    try {
+        const user = new User(req.body);
+        const savedUser = await user.save();
+        res.status(httpStatus.CREATED);
+        res.json(savedUser.transform());
+    } catch (error) {
+        next(User.checkDuplicateEmail(error));
+    }
 };
 
 /**
@@ -51,18 +51,18 @@ exports.create = async (req, res, next) => {
  * @public
  */
 exports.replace = async (req, res, next) => {
-  try {
-    const { loadedUser, user } = req.locals;
-    const newUser = new User(req.body);
-    const ommitRole = user.role !== 'admin' ? 'role' : '';
-    const newUserObject = omit(newUser.toObject(), '_id', ommitRole);
-    await loadedUser.replaceOne(newUserObject);
-    const savedUser = await User.findById(loadedUser._id);
+    try {
+        const { loadedUser, user } = req.locals;
+        const newUser = new User(req.body);
+        const ommitRole = user.role !== 'admin' ? 'role' : '';
+        const newUserObject = omit(newUser.toObject(), '_id', ommitRole);
+        await loadedUser.replaceOne(newUserObject);
+        const savedUser = await User.findById(loadedUser._id);
 
-    res.json(savedUser.transform());
-  } catch (error) {
-    next(User.checkDuplicateEmail(error));
-  }
+        res.json(savedUser.transform());
+    } catch (error) {
+        next(User.checkDuplicateEmail(error));
+    }
 };
 
 /**
@@ -70,14 +70,13 @@ exports.replace = async (req, res, next) => {
  * @public
  */
 exports.update = (req, res, next) => {
-  const ommitRole = req.locals.user.role !== 'admin' ? 'role' : '';
-  const updatedUser = omit(req.body, ommitRole);
-  const user = Object.assign(req.locals.loadedUser, updatedUser);
+    const ommitRole = req.locals.user.role !== 'admin' ? 'role' : '';
+    const updatedUser = omit(req.body, ommitRole);
+    const user = Object.assign(req.locals.loadedUser, updatedUser);
 
-  user
-    .save()
-    .then((savedUser) => res.json(savedUser.transform()))
-    .catch((e) => next(User.checkDuplicateEmail(e)));
+    user.save()
+        .then((savedUser) => res.json(savedUser.transform()))
+        .catch((e) => next(User.checkDuplicateEmail(e)));
 };
 
 /**
@@ -85,19 +84,18 @@ exports.update = (req, res, next) => {
  * @public
  */
 exports.updateUserProfile = (req, res, next) => {
-  const { firstname, lastname, phone, country, birthdate } = req.body;
-  const user = Object.assign(req.locals.user, {
-    firstname,
-    lastname,
-    phone,
-    country,
-    birthdate
-  });
+    const { firstname, lastname, phone, country, birthdate } = req.body;
+    const user = Object.assign(req.locals.user, {
+        firstname,
+        lastname,
+        phone,
+        country,
+        birthdate
+    });
 
-  user
-    .save()
-    .then((savedUser) => res.json(savedUser.transform()))
-    .catch((e) => next(User.checkDuplicateEmail(e)));
+    user.save()
+        .then((savedUser) => res.json(savedUser.transform()))
+        .catch((e) => next(User.checkDuplicateEmail(e)));
 };
 
 /**
@@ -105,13 +103,13 @@ exports.updateUserProfile = (req, res, next) => {
  * @public
  */
 exports.list = async (req, res, next) => {
-  try {
-    const users = await User.list(req.query);
-    const transformedUsers = users.map((user) => user.transform());
-    res.json(transformedUsers);
-  } catch (error) {
-    next(error);
-  }
+    try {
+        const users = await User.list(req.query);
+        const transformedUsers = users.map((user) => user.transform());
+        res.json(transformedUsers);
+    } catch (error) {
+        next(error);
+    }
 };
 
 /**
@@ -119,10 +117,10 @@ exports.list = async (req, res, next) => {
  * @public
  */
 exports.remove = (req, res, next) => {
-  const { loadedUser } = req.locals;
+    const { loadedUser } = req.locals;
 
-  loadedUser
-    .remove()
-    .then(() => res.status(httpStatus.NO_CONTENT).end())
-    .catch((e) => next(e));
+    loadedUser
+        .remove()
+        .then(() => res.status(httpStatus.NO_CONTENT).end())
+        .catch((e) => next(e));
 };

@@ -11,27 +11,27 @@ const APIStatus = require('../../../utils/APIStatus');
  * @public
  */
 exports.sendAccountLoginChangeCode = async (req, res, next) => {
-  try {
-    const { password, newEmail } = req.body;
-    const { user } = req.locals;
+    try {
+        const { password, newEmail } = req.body;
+        const { user } = req.locals;
 
-    if (user.email === newEmail) {
-      throw new APIError(Errors.LOGIN_MUST_BE_DIFFERENT);
-    }
+        if (user.email === newEmail) {
+            throw new APIError(Errors.LOGIN_MUST_BE_DIFFERENT);
+        }
 
-    if (user && (await user.passwordMatches(password))) {
-      await AccountLoginChangeCode.deleteMany({
-        userEmail: user.email
-      });
-      const accountLoginChangeCode = await AccountLoginChangeCode.generate(user, newEmail);
-      emailProvider.sendAccountLoginChangeCodeEmail(accountLoginChangeCode);
-      res.status(httpStatus.OK);
-      return res.json(new APIStatus({ message: 'Email sent successfully' }));
+        if (user && (await user.passwordMatches(password))) {
+            await AccountLoginChangeCode.deleteMany({
+                userEmail: user.email
+            });
+            const accountLoginChangeCode = await AccountLoginChangeCode.generate(user, newEmail);
+            emailProvider.sendAccountLoginChangeCodeEmail(accountLoginChangeCode);
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({ message: 'Email sent successfully' }));
+        }
+        throw new APIError(Errors.UNAUTHORIZED);
+    } catch (error) {
+        return next(error);
     }
-    throw new APIError(Errors.UNAUTHORIZED);
-  } catch (error) {
-    return next(error);
-  }
 };
 
 /**
@@ -39,29 +39,29 @@ exports.sendAccountLoginChangeCode = async (req, res, next) => {
  * @public
  */
 exports.changeUserLogin = async (req, res, next) => {
-  try {
-    const { password, code, newEmail } = req.body;
-    const { user } = req.locals;
-    const userEmail = user.email;
-    if (user && userEmail && newEmail && (await user.passwordMatches(password))) {
-      const changeLoginCodeObj = await AccountLoginChangeCode.findOneAndRemove({
-        userEmail,
-        newEmail,
-        code
-      });
-      if (!changeLoginCodeObj) {
-        await AccountLoginChangeCode.deleteMany({ userEmail });
+    try {
+        const { password, code, newEmail } = req.body;
+        const { user } = req.locals;
+        const userEmail = user.email;
+        if (user && userEmail && newEmail && (await user.passwordMatches(password))) {
+            const changeLoginCodeObj = await AccountLoginChangeCode.findOneAndRemove({
+                userEmail,
+                newEmail,
+                code
+            });
+            if (!changeLoginCodeObj) {
+                await AccountLoginChangeCode.deleteMany({ userEmail });
+                throw new APIError(Errors.UNAUTHORIZED);
+            }
+
+            user.email = newEmail;
+            await user.save();
+
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({ message: 'Login changed successfully' }));
+        }
         throw new APIError(Errors.UNAUTHORIZED);
-      }
-
-      user.email = newEmail;
-      await user.save();
-
-      res.status(httpStatus.OK);
-      return res.json(new APIStatus({ message: 'Login changed successfully' }));
+    } catch (error) {
+        return next(error);
     }
-    throw new APIError(Errors.UNAUTHORIZED);
-  } catch (error) {
-    return next(error);
-  }
 };

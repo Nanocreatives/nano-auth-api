@@ -9,11 +9,11 @@ router.use('/v1', v1Routes);
 
 // mount api routes
 router.get('/', (req, res) =>
-  res.send({
-    message: `Welcome to ${config.appName}`,
-    version: config.version,
-    status: 'OK'
-  })
+    res.send({
+        message: `Welcome to ${config.appName}`,
+        version: config.version,
+        status: 'OK'
+    })
 );
 
 module.exports = router;
