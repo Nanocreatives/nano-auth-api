@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
     req.correlationID = correlationID;
     config.correlationID = correlationID;
     res.cookie('x-correlation-id', correlationID, {
-        maxAge: 3600,
+        maxAge: 3600000,
         httpOnly: true,
         secure: false,
         sameSite: false
