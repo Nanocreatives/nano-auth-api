@@ -47,12 +47,7 @@ app.use(methodOverride());
 app.use(helmet());
 
 // enable CORS - Cross Origin Resource Sharing
-const corsConfig = {
-    origin: true,
-    credentials: true
-};
-
-app.use(cors(corsConfig));
+app.use(cors());
 
 // enable detailed API logging in dev env
 if (config.env) {
