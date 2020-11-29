@@ -32,6 +32,11 @@ const config = {
         appWebsiteUrl: process.env.EMAIL_APP_WEBSITE_URL,
         passwordResetUrl: process.env.EMAIL_PASSWORD_RESET_URL,
         accountVerificationUrl: process.env.EMAIL_ACCOUNT_VERIFICATION_URL
+    },
+    google: {
+        recaptcha: {
+            secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY
+        }
     }
 };
 
