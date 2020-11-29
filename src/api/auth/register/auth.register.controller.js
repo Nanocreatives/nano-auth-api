@@ -4,6 +4,7 @@ const { omit } = require('lodash');
 const User = require('../../user/user.model');
 const AccountVerificationToken = require('./auth.register.verification-token.model');
 const emailProvider = require('../../../services/email/email.provider');
+const { verify } = require('../../../services/google/recaptcha');
 const config = require('../../../config/config');
 const Errors = require('../../../utils/auth.errors');
 const APIError = require('../../../utils/APIError');
@@ -42,23 +43,27 @@ exports.register = async (req, res, next) => {
  */
 exports.verifyAccount = async (req, res, next) => {
     try {
-        const { token } = req.body;
-        const verificationTokenObject = await AccountVerificationToken.findOneAndRemove({
-            verificationToken: token
-        });
+        const captchaValid = await verify(req.body.captcha);
+        if (captchaValid) {
+            const { token } = req.body;
+            const verificationTokenObject = await AccountVerificationToken.findOneAndRemove({
+                verificationToken: token
+            });
 
-        if (!verificationTokenObject) {
-            throw new APIError(Errors.INVALID_TOKEN);
+            if (!verificationTokenObject) {
+                throw new APIError(Errors.INVALID_TOKEN);
+            }
+
+            const user = await User.findOne({
+                email: verificationTokenObject.userEmail
+            }).exec();
+            user.verified = true;
+            await user.save();
+
+            res.status(httpStatus.OK);
+            return res.json(new APIStatus({ message: 'Account verified successfully' }));
         }
-
-        const user = await User.findOne({
-            email: verificationTokenObject.userEmail
-        }).exec();
-        user.verified = true;
-        await user.save();
-
-        res.status(httpStatus.OK);
-        return res.json(new APIStatus({ message: 'Account verified successfully' }));
+        throw new APIError(Errors.CAPTCHA);
     } catch (error) {
         return next(error);
     }
