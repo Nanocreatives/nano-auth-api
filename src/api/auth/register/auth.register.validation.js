@@ -10,8 +10,7 @@ module.exports = {
 
     verifyAccount: {
         body: Joi.object({
-            token: Joi.string().required(),
-            captcha: Joi.string().required().min(10)
+            token: Joi.string().required()
         })
     },
 
