@@ -69,5 +69,10 @@ module.exports = {
         status: httpStatus.INTERNAL_SERVER_ERROR,
         code: 'KO_AUTH_TOKEN',
         message: 'Error occured while generating Auth Tokens'
+    },
+    CAPTCHA: {
+        status: httpStatus.TOO_MANY_REQUESTS,
+        code: 'KO_CAPTCHA',
+        message: 'Error occured while validating captcha'
     }
 };
