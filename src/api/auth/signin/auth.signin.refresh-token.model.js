@@ -41,13 +41,15 @@ refreshTokenSchema.statics = {
     generate(user) {
         const userId = user._id;
         const userEmail = user.email;
+        const userCountry = user.country;
         const token = `${Date.now()}.${crypto.randomBytes(40).toString('hex')}`;
         const expires = moment().add(config.auth.refreshTokenValidity, 'seconds').toDate();
         const tokenObject = new RefreshToken({
             token,
             userId,
             userEmail,
-            expires
+            expires,
+            userCountry
         });
         tokenObject.save();
         return tokenObject;
