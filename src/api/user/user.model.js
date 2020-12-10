@@ -189,6 +189,7 @@ userSchema.method({
             exp: moment().add(config.auth.accessTokenValidity, 'seconds').toDate(),
             iat: moment().toDate(),
             sub: this._id,
+            country: this.country,
             role: this.role
         };
         return jwt.encode(payload, config.auth.jwtSecret);
