@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { omit } = require('lodash');
+const moment = require('moment-timezone');
 
 const User = require('../../user/user.model');
 const AccountVerificationToken = require('./auth.register.verification-token.model');
@@ -70,12 +71,28 @@ exports.verifyAccount = async (req, res, next) => {
  */
 exports.sendAccountVerification = async (req, res, next) => {
     try {
-        const { email } = req.body;
+        const { email, password } = req.body;
         const user = await User.findOne({ email }).exec();
 
-        if (user && !user.verified) {
-            const accountVerificationObj = await AccountVerificationToken.generate(user);
-            emailProvider.sendAccountVerification(accountVerificationObj);
+        if (user && (await user.passwordMatches(password)) && !user.verified) {
+            const existingAccountVerificationToken = await AccountVerificationToken.findOne({
+                userEmail: email
+            });
+            if (!existingAccountVerificationToken) {
+                const accountVerificationObj = await AccountVerificationToken.generate(user);
+                emailProvider.sendAccountVerification(accountVerificationObj);
+            } else if (moment().add(-1, 'hours').isAfter(existingAccountVerificationToken.sentAt)) {
+                emailProvider.sendAccountVerification(existingAccountVerificationToken);
+                existingAccountVerificationToken.sentAt = Date.now();
+                existingAccountVerificationToken.save();
+            } else {
+                throw new APIError({
+                    status: httpStatus.UNAUTHORIZED,
+                    code: 'REQUEST_ALREADY_SENT',
+                    message: 'Verification Request already Sent',
+                    isPublic: true
+                });
+            }
             res.status(httpStatus.OK);
             return res.json(new APIStatus({ message: 'Email sent successfully' }));
         }
