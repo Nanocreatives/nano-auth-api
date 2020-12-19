@@ -27,8 +27,7 @@ const accountVerificationTokenSchema = new mongoose.Schema(
             default: Date.now
         },
         sentAt: {
-            type: Date,
-            default: Date.now
+            type: Date
         }
     },
     {

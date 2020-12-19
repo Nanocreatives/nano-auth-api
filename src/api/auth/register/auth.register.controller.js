@@ -81,6 +81,8 @@ exports.sendAccountVerification = async (req, res, next) => {
             if (!existingAccountVerificationToken) {
                 const accountVerificationObj = await AccountVerificationToken.generate(user);
                 emailProvider.sendAccountVerification(accountVerificationObj);
+                existingAccountVerificationToken.sentAt = Date.now();
+                existingAccountVerificationToken.save();
             } else if (moment().add(-1, 'hours').isAfter(existingAccountVerificationToken.sentAt)) {
                 emailProvider.sendAccountVerification(existingAccountVerificationToken);
                 existingAccountVerificationToken.sentAt = Date.now();
