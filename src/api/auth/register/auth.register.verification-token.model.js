@@ -25,6 +25,9 @@ const accountVerificationTokenSchema = new mongoose.Schema(
             type: Date,
             expires: '5d',
             default: Date.now
+        },
+        sentAt: {
+            type: Date
         }
     },
     {
