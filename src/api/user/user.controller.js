@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { omit } = require('lodash');
+const { omit, pickBy } = require('lodash');
 
 const User = require('./user.model');
 const logger = require('../../config/logger');
@@ -85,14 +85,17 @@ exports.update = (req, res, next) => {
  */
 exports.updateUserProfile = (req, res, next) => {
     const { firstname, lastname, phone, country, birthdate } = req.body;
-    const user = Object.assign(req.locals.user, {
-        firstname,
-        lastname,
-        phone,
-        country,
-        birthdate
-    });
-
+    const dataToUpdate = pickBy(
+        {
+            firstname,
+            lastname,
+            phone,
+            country,
+            birthdate
+        },
+        (value) => value !== undefined
+    );
+    const user = Object.assign(req.locals.user, dataToUpdate);
     user.save()
         .then((savedUser) => res.json(savedUser.transform()))
         .catch((e) => next(User.checkDuplicateEmail(e)));
