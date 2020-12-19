@@ -83,7 +83,10 @@ exports.sendAccountVerification = async (req, res, next) => {
                 emailProvider.sendAccountVerification(accountVerificationObj);
                 existingAccountVerificationToken.sentAt = Date.now();
                 existingAccountVerificationToken.save();
-            } else if (moment().add(-1, 'hours').isAfter(existingAccountVerificationToken.sentAt)) {
+            } else if (
+                !existingAccountVerificationToken.sentAt ||
+                moment().add(-1, 'hours').isAfter(existingAccountVerificationToken.sentAt)
+            ) {
                 emailProvider.sendAccountVerification(existingAccountVerificationToken);
                 existingAccountVerificationToken.sentAt = Date.now();
                 existingAccountVerificationToken.save();
