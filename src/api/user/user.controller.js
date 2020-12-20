@@ -3,6 +3,7 @@ const { omit, pickBy } = require('lodash');
 
 const User = require('./user.model');
 const logger = require('../../config/logger');
+const AuthSignInController = require('../auth/signin/auth.signin.controller');
 
 /**
  * Load user and append to req.
@@ -97,8 +98,8 @@ exports.updateUserProfile = (req, res, next) => {
     );
     const user = Object.assign(req.locals.user, dataToUpdate);
     user.save()
-        .then((savedUser) => res.json(savedUser.transform()))
-        .catch((e) => next(User.checkDuplicateEmail(e)));
+        .then(() => AuthSignInController.refresh(req, res, next))
+        .catch((e) => next(e));
 };
 
 /**
