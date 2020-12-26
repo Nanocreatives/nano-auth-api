@@ -12,7 +12,7 @@ const config = require('./config');
 const logger = require('./logger');
 const routes = require('../routes');
 const error = require('../middlewares/error');
-const correlator = require('../middlewares/correlator');
+// const correlator = require('../middlewares/correlator');
 
 const app = express();
 
@@ -67,7 +67,7 @@ if (config.env) {
 }
 
 // Correlator Middleware to Get and/or Set Correlation ID
-app.use(correlator);
+// app.use(correlator);
 
 // Routes Configuration
 app.use('/', routes);
