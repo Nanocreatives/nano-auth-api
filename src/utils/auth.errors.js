@@ -74,5 +74,10 @@ module.exports = {
         status: httpStatus.TOO_MANY_REQUESTS,
         code: 'KO_CAPTCHA',
         message: 'Error occured while validating captcha'
+    },
+    CONFLICT: {
+        status: httpStatus.CONFLICT,
+        code: 'CONFLICT',
+        message: 'Error'
     }
 };

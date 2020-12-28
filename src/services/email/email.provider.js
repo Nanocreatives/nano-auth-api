@@ -158,7 +158,7 @@ exports.sendAccountLoginChangeCodeEmail = async (accountLoginChangeObject) => {
         .send({
             template: 'account-login-change',
             message: {
-                to: accountLoginChangeObject.userEmail
+                to: accountLoginChangeObject.newEmail
             },
             locals: {
                 appName: config.email.appName,
