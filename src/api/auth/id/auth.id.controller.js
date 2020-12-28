@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 
+const User = require('../../user/user.model');
 const AccountLoginChangeCode = require('./auth.id.login-change-code.model');
 const emailProvider = require('../../../services/email/email.provider');
 const Errors = require('../../../utils/auth.errors');
@@ -15,11 +16,14 @@ exports.sendAccountLoginChangeCode = async (req, res, next) => {
         const { password, newEmail } = req.body;
         const { user } = req.locals;
 
-        if (user.email === newEmail) {
-            throw new APIError(Errors.LOGIN_MUST_BE_DIFFERENT);
-        }
-
         if (user && (await user.passwordMatches(password))) {
+            if (user.email === newEmail) {
+                throw new APIError(Errors.LOGIN_MUST_BE_DIFFERENT);
+            }
+            const duplicate = await User.findOne({ email: newEmail }).exec();
+            if (duplicate) {
+                throw new APIError(Errors.CONFLICT);
+            }
             await AccountLoginChangeCode.deleteMany({
                 userEmail: user.email
             });
@@ -62,6 +66,6 @@ exports.changeUserLogin = async (req, res, next) => {
         }
         throw new APIError(Errors.UNAUTHORIZED);
     } catch (error) {
-        return next(error);
+        return next(User.checkDuplicateEmail(error));
     }
 };
