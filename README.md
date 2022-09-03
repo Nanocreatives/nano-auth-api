@@ -1,8 +1,6 @@
 # Nanocreatives Authentication API
 
 ![](https://github.com/Nanocreatives/nano-auth-api/workflows/Continuous%20Integration/badge.svg)
-[![codecov](https://codecov.io/gh/Nanocreatives/nano-auth-api/branch/master/graph/badge.svg?token=B8RQO712CW)](https://codecov.io/gh/Nanocreatives/nano-auth-api)
-[![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
 Authentication management restful API built with Node.js, Express and MongoDB
