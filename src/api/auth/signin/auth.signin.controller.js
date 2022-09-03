@@ -12,46 +12,20 @@ const APIStatus = require('../../../utils/APIStatus');
  * Returns a formated object with tokens
  * @private
  */
-function generateTokenResponse(user, accessToken, res) {
-    const tokenParts = accessToken.split('.');
-    if (tokenParts.length === 3) {
-        res.cookie('access_token_hp', `${tokenParts[0]}.${tokenParts[1]}`, {
-            maxAge: parseInt(config.auth.accessTokenValidity, 10) * 1000,
-            httpOnly: false,
-            secure: config.env !== 'development',
-            sameSite: true
-        });
-
-        res.cookie('access_token_s', tokenParts[2], {
-            maxAge: parseInt(config.auth.accessTokenValidity, 10) * 1000,
-            httpOnly: true,
-            secure: config.env !== 'development',
-            signed: true,
-            sameSite: true
-        });
-
+function generateTokenResponse(user, accessToken) {
+    if (user && accessToken) {
         const refreshToken = RefreshToken.generate(user).token;
-        res.cookie('refresh_token', refreshToken, {
-            maxAge: parseInt(config.auth.refreshTokenValidity, 10) * 1000,
-            httpOnly: true,
-            secure: config.env !== 'development',
-            signed: true,
-            sameSite: true
-        });
-    } else {
-        throw new APIError(Errors.KO_AUTH_TOKEN);
+        return {
+            accessToken,
+            tokenType: 'Bearer',
+            expiresAt: parseInt(
+                (Date.now() + parseInt(config.auth.accessTokenValidity, 10) * 1000) / 1000,
+                10
+            ),
+            refreshToken
+        };
     }
-}
-
-/**
- * Clear all authentication Cookies
- * @param res
- * @private
- */
-function clearAuthCookies(res) {
-    res.clearCookie('access_token_hp');
-    res.clearCookie('access_token_s');
-    res.clearCookie('refresh_token');
+    throw new APIError(Errors.KO_AUTH_TOKEN);
 }
 
 /**
@@ -61,8 +35,8 @@ function clearAuthCookies(res) {
 exports.login = async (req, res, next) => {
     try {
         const { user, accessToken } = await User.findAndGenerateToken(req.body);
-        generateTokenResponse(user, accessToken, res);
-        return res.json(user.transform());
+        const response = generateTokenResponse(user, accessToken, res);
+        return res.json(response);
     } catch (error) {
         if (
             req.body &&
@@ -84,8 +58,8 @@ exports.oAuth = async (req, res, next) => {
     try {
         const { user } = req.locals;
         const accessToken = user.token();
-        generateTokenResponse(user, accessToken, res);
-        return res.json(user.transform());
+        const response = generateTokenResponse(user, accessToken, res);
+        return res.json(response);
     } catch (error) {
         return next(error);
     }
@@ -128,7 +102,6 @@ exports.logout = async (req, res, next) => {
         await RefreshToken.deleteOne({
             token: refreshTokenCookie
         });
-        clearAuthCookies(res);
 
         res.status(httpStatus.OK);
 

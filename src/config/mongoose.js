@@ -26,11 +26,9 @@ if (env === 'development') {
 exports.connect = () => {
     mongoose
         .connect(mongo.host, {
-            useCreateIndex: true,
             keepAlive: 1,
             useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false
+            useUnifiedTopology: true
         })
         .then(() => logger.info('mongoDB connected...'));
     return mongoose.connection;
